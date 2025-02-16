@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: ms-task-organiser
+  neo4j:
+    uri: bolt://localhost:7687
+    security:
+      encrypted: false
+    authentication:
+      username: ms-task-organiser
+      password: ms-task-organiser
+  data:
+    neo4j:
+      database: neo4j
+logging:
+  level:
+    org.springframework.data.neo4j: INFO
+
+jarAnalyzer:
+  engines:
+    threadPoolSize: 20
+    coordinator:
+      url: http://loadgenerator.lz001
+      port: 8080
+
+management:
+  endpoints:
+    web:
+      base-path: /probe

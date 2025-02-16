@@ -1,0 +1,11 @@
+spring:
+  neo4j:
+    uri: bolt://172.31.31.167:7687
+    security:
+      encrypted: false
+    authentication:
+      username: importtool
+      password: ms-task-organiser
+  data:
+    neo4j:
+      database: neo4j
