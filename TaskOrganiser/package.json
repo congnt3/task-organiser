@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@primevue/auto-import-resolver": "^4.2.5",
+    "@primevue/themes": "^4.2.5",
+    "primevue": "^4.2.5"
+  }
+}
