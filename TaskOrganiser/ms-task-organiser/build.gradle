@@ -31,7 +31,6 @@ ext {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-neo4j'
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-hateoas'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -39,7 +38,7 @@ dependencies {
 
 	// MapStruct dependencies
 	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
-	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 
 	// Lombok configuration with MapStruct
 	compileOnly 'org.projectlombok:lombok'

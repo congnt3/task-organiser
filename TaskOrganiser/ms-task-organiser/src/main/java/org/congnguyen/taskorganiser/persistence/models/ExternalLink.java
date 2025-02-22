@@ -14,7 +14,7 @@ import org.springframework.data.neo4j.core.schema.Relationship;
 @Builder
 @AllArgsConstructor
 @Data
-public class ExternalLink implements IExternalLink {
+public class ExternalLink {
     @Property("code")
     @Id
     private String code;

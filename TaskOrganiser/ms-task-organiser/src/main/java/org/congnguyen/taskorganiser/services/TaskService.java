@@ -1,5 +1,7 @@
 package org.congnguyen.taskorganiser.services;
 
+import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.congnguyen.taskorganiser.persistence.models.Task;
 import org.congnguyen.taskorganiser.persistence.repositories.TaskRepository;
 import org.congnguyen.taskorganiser.web.mappers.TaskMapper;
@@ -8,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Log4j2
 public class TaskService {
 
     private final TaskRepository taskRepository;
