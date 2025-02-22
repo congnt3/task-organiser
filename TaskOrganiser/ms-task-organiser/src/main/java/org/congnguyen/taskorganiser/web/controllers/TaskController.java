@@ -45,6 +45,20 @@ public class TaskController {
         }
     }
 
+    @PutMapping
+    public ResponseEntity<?> updateTask(@Validated @RequestBody CreateTaskRequest request) {
+        try {
+            var task = taskMapperImpl.createTaskRequestToTask(request);
+            var updatedTask = taskService.updateTask(task);
+            var taskModel = taskMapperImpl.taskToTaskModel(updatedTask);
+            return ResponseEntity.status(HttpStatus.CREATED).body(taskModel);
+        } catch (RecordNotFoundException e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
     @GetMapping("/code/{code}")
     public ResponseEntity<TaskModel> getTaskByCode(@PathVariable("code") String code) {
         try {

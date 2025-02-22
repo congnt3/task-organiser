@@ -41,6 +41,9 @@ public class TaskService {
     public Task updateTask(Task request) throws RecordNotFoundException {
         var task = taskRepository.findByCode(request.getCode())
                 .orElseThrow(() -> new RecordNotFoundException(String.format("Task with code %s not exists.", request.getCode())));
+        task.getDependsOn()
+                .clear();
+        task.getDependsOn().addAll(request.getDependsOn());
 
         return taskRepository.save(task);
     }
