@@ -2,12 +2,16 @@ import {createApp} from 'vue'
 import App from './App.vue'
 import PrimeVue from 'primevue/config'
 import Aura from '@primevue/themes/aura';
-
-// Import PrimeVue styles
-
+import ConfirmationService from 'primevue/confirmationservice';
+import ToastService from 'primevue/toastservice';
+import router from './router';
+import '@/assets/styles.scss';
+import '@/assets/tailwind.css';
 import 'primeicons/primeicons.css'
 
 const app = createApp(App)
+
+app.use(router);
 
 app.use(PrimeVue, {
   ripple: true,
@@ -15,4 +19,6 @@ app.use(PrimeVue, {
     preset: Aura
   }
 })
+app.use(ToastService);
+app.use(ConfirmationService);
 app.mount('#app')
