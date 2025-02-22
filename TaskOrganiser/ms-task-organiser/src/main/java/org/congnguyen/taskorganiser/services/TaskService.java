@@ -8,6 +8,8 @@ import org.congnguyen.taskorganiser.persistence.exceptions.RecordNotFoundExcepti
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @Log4j2
 public class TaskService {
@@ -22,6 +24,10 @@ public class TaskService {
     public Task getTaskByCode(String code) throws RecordNotFoundException {
         return taskRepository.findByCode(code)
                 .orElseThrow(() -> new RecordNotFoundException(String.format("Task with code %s not exists.", code)));
+    }
+
+    public Optional<Task> findTaskByCode(String code) {
+        return taskRepository.findByCode(code);
     }
 
     public Task createTask(Task request) throws DuplicatedRecordException {

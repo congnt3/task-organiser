@@ -2,6 +2,7 @@ package org.congnguyen.taskorganiser.web.controllers;
 
 import org.congnguyen.taskorganiser.persistence.exceptions.DuplicatedRecordException;
 import org.congnguyen.taskorganiser.persistence.models.Task;
+import org.congnguyen.taskorganiser.persistence.repositories.TaskRepository;
 import org.congnguyen.taskorganiser.services.TaskService;
 import org.congnguyen.taskorganiser.persistence.exceptions.RecordNotFoundException;
 import org.congnguyen.taskorganiser.web.mappers.TaskMapperImpl;
@@ -21,11 +22,13 @@ import java.util.List;
 public class TaskController {
     private final TaskService taskService;
     private final TaskMapperImpl taskMapperImpl;
+    private final TaskRepository taskRepository;
 
     @Autowired
-    public TaskController(TaskService taskService, TaskMapperImpl taskMapperImpl) {
+    public TaskController(TaskService taskService, TaskMapperImpl taskMapperImpl, TaskRepository taskRepository) {
         this.taskService = taskService;
         this.taskMapperImpl = taskMapperImpl;
+        this.taskRepository = taskRepository;
     }
 
     @PostMapping
@@ -55,11 +58,20 @@ public class TaskController {
     // Not working
     @GetMapping("/parent/{parent_code}")
     public ResponseEntity<List<TaskModel>> getTaskByParentCode(@PathVariable("parent_code") String code) {
-        try {
-            Task task = taskService.getTaskByCode(code);
-            return ResponseEntity.ok(List.of(taskMapperImpl.taskToTaskModel(task)));
-        } catch (RecordNotFoundException e) {
+        var tasks = taskService.findTaskByCode(code);
+        if (tasks.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+
+        return ResponseEntity.ok(
+                taskRepository.findChildrenByTaskCode(tasks.get().getCode()).stream()
+                        .map(taskMapperImpl::taskToTaskModel).toList());
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<List<TaskModel>> getTopLevelTasks() {
+        return ResponseEntity.ok(
+                taskRepository.findTopLevelTasks().stream()
+                        .map(taskMapperImpl::taskToTaskModel).toList());
     }
 }

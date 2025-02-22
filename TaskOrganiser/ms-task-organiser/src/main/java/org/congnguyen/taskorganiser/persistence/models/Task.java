@@ -37,8 +37,7 @@ public class Task extends ModelBase  {
     @Relationship(value = "memberOf", direction = Relationship.Direction.OUTGOING, cascadeUpdates = false)
     private Task parent;
 
-    @Relationship(value = "memberOf", direction = Relationship.Direction.INCOMING, cascadeUpdates = false)
-
+    //Intended not to be loaded automatically
     private List<Task> children;
 
     @Relationship(value = "dependsOn", direction = Relationship.Direction.OUTGOING, cascadeUpdates = false)
