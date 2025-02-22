@@ -24,5 +24,4 @@ public class CreateTaskRequest {
     private List<String> dependsOnTasks;
 
     private List<IExternalLink> externalLinks;
-    // Add other fields as needed
 }

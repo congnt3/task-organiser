@@ -1,4 +1,4 @@
-package org.congnguyen.taskorganiser.web.exceptions;
+package org.congnguyen.taskorganiser.persistence.exceptions;
 
 public class RecordNotFoundException extends Exception{
     public RecordNotFoundException(String message) {

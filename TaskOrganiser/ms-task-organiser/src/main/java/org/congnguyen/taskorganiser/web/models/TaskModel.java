@@ -18,6 +18,8 @@ public class TaskModel {
 
     private String parentCode;
 
+    private List<TaskModel> children;
+
     private List<String> dependsOnTasks;
 
     private List<ExternalLink> externalLinks;

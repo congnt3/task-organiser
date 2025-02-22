@@ -1,7 +1,9 @@
 package org.congnguyen.taskorganiser.web.controllers;
 
+import org.congnguyen.taskorganiser.persistence.exceptions.DuplicatedRecordException;
 import org.congnguyen.taskorganiser.persistence.models.Task;
 import org.congnguyen.taskorganiser.services.TaskService;
+import org.congnguyen.taskorganiser.persistence.exceptions.RecordNotFoundException;
 import org.congnguyen.taskorganiser.web.mappers.TaskMapperImpl;
 import org.congnguyen.taskorganiser.web.models.CreateTaskRequest;
 import org.congnguyen.taskorganiser.web.models.ErrorResponse;
@@ -11,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -27,10 +31,11 @@ public class TaskController {
     @PostMapping
     public ResponseEntity<?> createTask(@Validated @RequestBody CreateTaskRequest request) {
         try {
-            Task createdTask = taskService.createTask(request);
+            var task = taskMapperImpl.createTaskRequestToTask(request);
+            var createdTask = taskService.createTask(task);
             var taskModel = taskMapperImpl.taskToTaskModel(createdTask);
             return ResponseEntity.status(HttpStatus.CREATED).body(taskModel);
-        } catch (RuntimeException e) {
+        } catch (DuplicatedRecordException e) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse(e.getMessage()));
@@ -42,7 +47,18 @@ public class TaskController {
         try {
             Task task = taskService.getTaskByCode(code);
             return ResponseEntity.ok(taskMapperImpl.taskToTaskModel(task));
-        } catch (RuntimeException e) {
+        } catch (RecordNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // Not working
+    @GetMapping("/parent/{parent_code}")
+    public ResponseEntity<List<TaskModel>> getTaskByParentCode(@PathVariable("parent_code") String code) {
+        try {
+            Task task = taskService.getTaskByCode(code);
+            return ResponseEntity.ok(List.of(taskMapperImpl.taskToTaskModel(task)));
+        } catch (RecordNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }

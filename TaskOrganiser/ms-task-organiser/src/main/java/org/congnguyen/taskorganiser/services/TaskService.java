@@ -1,11 +1,10 @@
 package org.congnguyen.taskorganiser.services;
 
 import lombok.extern.log4j.Log4j2;
-import lombok.extern.slf4j.Slf4j;
+import org.congnguyen.taskorganiser.persistence.exceptions.DuplicatedRecordException;
 import org.congnguyen.taskorganiser.persistence.models.Task;
 import org.congnguyen.taskorganiser.persistence.repositories.TaskRepository;
-import org.congnguyen.taskorganiser.web.mappers.TaskMapper;
-import org.congnguyen.taskorganiser.web.models.CreateTaskRequest;
+import org.congnguyen.taskorganiser.persistence.exceptions.RecordNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,25 +13,29 @@ import org.springframework.stereotype.Service;
 public class TaskService {
 
     private final TaskRepository taskRepository;
-    private final TaskMapper taskMapper;
 
     @Autowired
-    public TaskService(TaskRepository taskRepository, TaskMapper taskMapper) {
+    public TaskService(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
-        this.taskMapper = taskMapper;
     }
 
-    public Task getTaskByCode(String code) {
+    public Task getTaskByCode(String code) throws RecordNotFoundException {
         return taskRepository.findByCode(code)
-                .orElseThrow(() -> new RuntimeException("Task not found with code: " + code));
+                .orElseThrow(() -> new RecordNotFoundException(String.format("Task with code %s not exists.", code)));
     }
 
-    public Task createTask(CreateTaskRequest request) {
+    public Task createTask(Task request) throws DuplicatedRecordException {
         if (taskRepository.findByCode(request.getCode()).isPresent()) {
-            throw new RuntimeException("Task with code " + request.getCode() + " already exists");
+            throw new DuplicatedRecordException(String.format("Task with code %s already exists.", request.getCode()));
         }
 
-        Task newTask = taskMapper.createTaskRequestToTask(request);
-        return taskRepository.save(newTask);
+        return taskRepository.save(request);
+    }
+
+    public Task updateTask(Task request) throws RecordNotFoundException {
+        var task = taskRepository.findByCode(request.getCode())
+                .orElseThrow(() -> new RecordNotFoundException(String.format("Task with code %s not exists.", request.getCode())));
+
+        return taskRepository.save(task);
     }
 }

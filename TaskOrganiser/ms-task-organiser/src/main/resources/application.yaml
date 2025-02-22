@@ -11,6 +11,13 @@ spring:
   data:
     neo4j:
       database: neo4j
+
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+    livereload:
+      enabled: true
 logging:
   level:
     org.springframework.data.neo4j: INFO
