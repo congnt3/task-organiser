@@ -2,7 +2,7 @@
 import {CustomerService} from '@/service/CustomerService';
 import {ProductService} from '@/service/ProductService';
 import {FilterMatchMode, FilterOperator} from '@primevue/core/api';
-import TaskCrud from '@/components/task/TaskCrud.vue';
+import TaskRelations from '@/components/task/TaskRelations.vue';
 
 import {onBeforeMount, reactive, ref} from 'vue';
 
@@ -131,7 +131,7 @@ function formatCurrency(value) {
             </Column>
             <template #expansion="slotProps">
                 <div class="p-1">
-                    <TaskCrud></TaskCrud>
+                    <TaskRelations></TaskRelations>
                 </div>
             </template>
         </DataTable>
