@@ -98,43 +98,11 @@ function formatCurrency(value) {
 <template>
     <div class="card">
         <div class="font-semibold text-xl mb-4">Row Expansion</div>
-        <DataTable v-model:expandedRows="expandedRows" :value="products" dataKey="id" tableStyle="min-width: 60rem">
-            <template #header>
-                <div class="flex flex-wrap justify-end gap-2">
-                    <Button text icon="pi pi-plus" label="Expand All" @click="expandAll"/>
-                    <Button text icon="pi pi-minus" label="Collapse All" @click="collapseAll"/>
-                </div>
-            </template>
-            <Column expander style="width: 5rem"/>
-            <Column field="name" header="Name"></Column>
-            <Column header="Image">
-                <template #body="slotProps">
-                    <img :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.data.image}`"
-                         :alt="slotProps.data.image" class="shadow-lg" width="64"/>
-                </template>
-            </Column>
-            <Column field="price" header="Price">
-                <template #body="slotProps">
-                    {{ formatCurrency(slotProps.data.price) }}
-                </template>
-            </Column>
-            <Column field="category" header="Category"></Column>
-            <Column field="rating" header="Reviews">
-                <template #body="slotProps">
-                    <Rating :modelValue="slotProps.data.rating" readonly/>
-                </template>
-            </Column>
-            <Column header="Status">
-                <template #body="slotProps">
-                    <Tag :value="slotProps.data.inventoryStatus" :severity="getStockSeverity(slotProps.data)"/>
-                </template>
-            </Column>
-            <template #expansion="slotProps">
-                <div class="p-1">
-                    <TaskRelations></TaskRelations>
-                </div>
-            </template>
-        </DataTable>
+        <TreeTable :value="treeTableValue" selectionMode="checkbox" v-model:selectionKeys="selectedTreeTableValue">
+            <Column field="name" header="Name" :expander="true"></Column>
+            <Column field="size" header="Size"></Column>
+            <Column field="type" header="Type"></Column>
+        </TreeTable>
     </div>
 </template>
 

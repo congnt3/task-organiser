@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import {ref, defineProps, withDefaults} from 'vue'
+import {ref, withDefaults} from 'vue'
 
 // Define props with TypeScript interface
 interface Props {
+    mode: string;
     parentTask: string;
     code?: string;
     name?: string;
@@ -11,18 +12,17 @@ interface Props {
     deadline?: string;
 }
 
-// // Define the props with defaults
-const props = withDefaults(defineProps<Props>(), {
-    parentTask: "/"
-})
+// Define the props with defaults
+let props = defineModel<Props>();
 
 let model = ref({
-    parentTask: props.parentTask,
-    code: props.code,
-    name: props.name,
-    description: props.description,
-    status: props.status,
-    deadline: props.deadline
+    mode: props.value.mode,
+    parentTask: props.value.parentTask,
+    code: props.value.code,
+    name: props.value.name,
+    description: props.value.description,
+    status: props.value.status,
+    deadline: props.value.deadline
 })
 
 const dropdownStates = ref([
@@ -49,26 +49,32 @@ const dropdownStates = ref([
                 <div class="flex flex-col md:flex-row gap-4">
                     <div class="flex flex-wrap gap-2 w-full">
                         <label for="name">Name</label>
-                        <InputText id="name" type="text" v-model="model.name"/>
+                        <InputText id="name" type="text" v-model="props.name"/>
                     </div>
                 </div>
 
                 <div class="flex flex-wrap">
                     <label for="description">Description</label>
-                    <Textarea id="description" rows="4" v-model="model.description"/>
+                    <Textarea id="description" rows="4" v-model="props.description"/>
                 </div>
                 <div class="flex flex-col md:flex-row gap-4">
                     <div class="flex flex-wrap gap-2 w-full">
                         <label for="status">Status</label>
-                        <Select id="status" v-model="model.status" :options="dropdownStates"
+                        <Select id="status" v-model="props.status" :options="dropdownStates"
                                 optionLabel="name"
                                 placeholder="Select One" class="w-full"
                                 default-value="New"></Select>
                     </div>
+
                     <div class="flex flex-wrap gap-2 w-full">
                         <label for="deadline">Deadline</label>
-                        <InputText id="deadline" type="text" v-model="model.deadline"/>
+                        <InputText id="deadline" type="text" v-model="props.deadline"/>
                     </div>
+
+                </div>
+                <div class="flex flex-col md:flex-row gap-4">
+                    <Button label="Save" icon="pi pi-check" @click=""/>
+                    <Button label="Save As New" icon="pi pi-check" @click=""/>
                 </div>
             </div>
         </div>

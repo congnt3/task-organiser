@@ -97,7 +97,7 @@ const router = createRouter({
                 {
                     path: '/pages/crud',
                     name: 'crud',
-                    component: () => import('@/views/pages/Crud.vue')
+                    component: () => import('@/views/pages/TaskListing.vue')
                 },
                 {
                     path: '/documentation',

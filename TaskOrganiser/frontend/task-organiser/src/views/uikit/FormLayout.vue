@@ -6,18 +6,18 @@ import { useRoute } from 'vue-router';
 const route = useRoute()
 
 // Create a reactive ref to store the query parameter value
-const parentTask = ref('')
+const taskModel = ref({})
 
 // Set the value initially
 onMounted(() => {
-    parentTask.value = route.query.parentTask || null
+    taskModel.value.parentTask = route.query.parentTask || null
 })
 
 // Watch for URL query parameter changes
 watch(
     () => route.query.parentTask,
     (newValue) => {
-        parentTask.value = newValue || null
+        taskModel.value.parentTask = newValue || null
     }
 )
 
@@ -31,5 +31,6 @@ const dropdownItem = ref(null);
 </script>
 
 <template>
-    <TaskCrud :parentTask="parentTask"/>
+    <p>Model: {{ taskModel }}</p>
+    <TaskCrud v-model="taskModel"/>
 </template>
