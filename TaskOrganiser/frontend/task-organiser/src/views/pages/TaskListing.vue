@@ -107,6 +107,19 @@ function deleteProduct() {
     toast.add({severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000});
 }
 
+function createChildTask(parentTask) {
+    if (!parentTask) {
+        return;
+    }
+    // Here you can implement the logic to create a child task
+    // For example:
+    // 1. Open a dialog/modal
+    // 2. Get the new task details
+    // 3. Make API call to create child task
+    // 4. Refresh the tree table
+    console.log('Creating child task for parent:', parentTask);
+}
+
 function findIndexById(id) {
     let index = -1;
     for (let i = 0; i < products.value.length; i++) {
@@ -158,16 +171,16 @@ const onExpand = (node) => {
             lazyNode.children = [
                 {
                     data: {
+                        code: lazyNode.data.code + ' - 0',
                         name: lazyNode.data.name + ' - 0',
-                        size: Math.floor(Math.random() * 1000) + 1 + 'kb',
-                        type: 'File'
+                        status: Math.floor(Math.random() * 1000) + 1 + 'kb'
                     },
                 },
                 {
                     data: {
+                        code: lazyNode.data.code + ' - 1',
                         name: lazyNode.data.name + ' - 1',
-                        size: Math.floor(Math.random() * 1000) + 1 + 'kb',
-                        type: 'File'
+                        status: Math.floor(Math.random() * 1000) + 1 + 'kb'
                     }
                 }
             ];
@@ -201,9 +214,9 @@ const loadNodes = (first, rows) => {
         let node = {
             key: (first + i),
             data: {
+                code: 'US' + (first + i),
                 name: 'Item ' + (first + i),
-                size: Math.floor(Math.random() * 1000) + 1 + 'kb',
-                type: 'Type ' + (first + i)
+                status: Math.floor(Math.random() * 1000) + 1 + 'kb'
             },
             leaf: false
         };
@@ -242,6 +255,10 @@ const loadNodes = (first, rows) => {
                                 @click="editProduct(slotProps.node.data)"/>
                         <Button icon="pi pi-trash" outlined rounded severity="danger"
                                 @click="confirmDeleteProduct(slotProps.data)"/>
+                        <Button icon="pi pi-plus" outlined rounded class="mr-2"
+                                @click="createChildTask(slotProps.node.data)"
+                                :disabled="!slotProps.node.data"
+                                tooltip="Create Child Task"/>
                     </template>
                 </Column>
             </TreeTable>

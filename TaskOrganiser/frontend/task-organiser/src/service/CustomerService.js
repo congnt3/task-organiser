@@ -1,3 +1,4 @@
+import config from "./config"
 export const CustomerService = {
     getData() {
         return [
