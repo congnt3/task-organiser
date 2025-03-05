@@ -1,5 +1,5 @@
 <script setup>
-import {ProductService} from '@/service/ProductService';
+import {ProductService1} from '@/service/ProductService1';
 import {FilterMatchMode} from '@primevue/core/api';
 import {useToast} from 'primevue/usetoast';
 import {onMounted, ref, watch} from 'vue';
@@ -13,7 +13,7 @@ const taskModel = ref({})
 
 // Set the value initially
 onMounted(() => {
-    ProductService.getProducts().then((data) => (products.value = data));
+    ProductService1.getProductsData().then((data) => (products.value = data));
     taskModel.value.parentTask = route.query.parentTask || undefined;
 
     loading.value = true;

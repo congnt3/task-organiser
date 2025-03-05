@@ -17,7 +17,7 @@ export interface RequestOptions {
   timeout?: number;
 }
 
-class ApiService {
+export class ApiService {
   private baseUrl: string;
   private defaultHeaders: Record<string, string>;
 
@@ -34,16 +34,16 @@ class ApiService {
    */
   private createUrl(endpoint: string, options?: RequestOptions): string {
     const url = `${this.baseUrl}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
-    
+
     if (!options?.params) {
       return url;
     }
-    
+
     const queryParams = new URLSearchParams();
     Object.entries(options.params).forEach(([key, value]) => {
       queryParams.append(key, value);
     });
-    
+
     return `${url}?${queryParams.toString()}`;
   }
 
@@ -59,7 +59,7 @@ class ApiService {
     try {
       const url = this.createUrl(endpoint, options);
       const headers = { ...this.defaultHeaders, ...options?.headers };
-      
+
       // Create AbortController for timeout handling
       const controller = new AbortController();
       const { signal } = controller;
@@ -78,7 +78,7 @@ class ApiService {
       };
 
       const response = await fetch(url, fetchOptions);
-      
+
       // Clear timeout if it was set
       if (timeoutId) {
         clearTimeout(timeoutId);
@@ -87,7 +87,7 @@ class ApiService {
       // Parse response
       let responseData: T | undefined;
       const contentType = response.headers.get('content-type');
-      
+
       if (contentType && contentType.includes('application/json')) {
         responseData = await response.json();
       }
@@ -112,13 +112,13 @@ class ApiService {
             error: 'Request timeout'
           };
         }
-        
+
         return {
           status: 0,
           error: error.message
         };
       }
-      
+
       return {
         status: 0,
         error: 'Unknown error occurred'
