@@ -1,6 +1,6 @@
 <script setup>
 import {CustomerService} from '@/service/CustomerService';
-import {ProductService1} from '@/service/ProductService1';
+import {ProductService} from '@/service/ProductService';
 import {FilterMatchMode, FilterOperator} from '@primevue/core/api';
 import TaskRelations from '@/components/task/TaskRelations.vue';
 
@@ -52,7 +52,7 @@ function getStockSeverity(product) {
 }
 
 onBeforeMount(() => {
-    ProductService1.getProductsWithOrdersSmall().then((data) => {products.value = data; products1.value = data;});
+    ProductService.getProductsWithOrdersSmall().then((data) => {products.value = data; products1.value = data;});
     CustomerService.getCustomersLarge().then((data) => {
         customers1.value = data;
         loading1.value = false;
