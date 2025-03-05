@@ -17,6 +17,8 @@ import ConfirmationService from 'primevue/confirmationservice';
 import ToastService from 'primevue/toastservice';
 import Aura from '@primevue/themes/aura';
 import '@/assets/styles.scss';
+import '@/assets/tailwind.css';
+import 'primeicons/primeicons.css'
 
 const app = createApp(App);
 
