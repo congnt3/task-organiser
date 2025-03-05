@@ -45,7 +45,7 @@ public class TaskController {
         }
     }
 
-    @PutMapping
+    @PutMapping("/code/{code}")
     public ResponseEntity<?> updateTask(@Validated @RequestBody CreateTaskRequest request) {
         try {
             var task = taskMapperImpl.createTaskRequestToTask(request);
