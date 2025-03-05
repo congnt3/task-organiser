@@ -1,4 +1,4 @@
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 export const RETRIEVE_TASK_ENDPOINT = "/api/tasks/code/{{code}}";
 export const CREATE_TASK_ENDPOINT = "/api/tasks";
 export const UPDATE_TASK_ENDPOINT = "/api/tasks/code/{{code}}";

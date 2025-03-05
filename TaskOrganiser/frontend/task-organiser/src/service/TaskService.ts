@@ -39,7 +39,7 @@ export class TaskService {
      * Retrieve all tasks
      * @returns Promise with array of tasks
      */
-    async getAllTasks(parentCode: string): Promise<Task[]> {
+    public async getAllTasks(parentCode: string): Promise<Task[]> {
         const response = await this.apiService.get<Task[]>(RETRIEVE_TASKS_BY_PARENT_ENDPOINT.replace("{{code}}", parentCode));
         return response.data || [];
     }

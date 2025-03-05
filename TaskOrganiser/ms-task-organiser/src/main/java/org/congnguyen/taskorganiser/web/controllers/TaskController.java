@@ -51,11 +51,14 @@ public class TaskController {
             var task = taskMapperImpl.createTaskRequestToTask(request);
             var updatedTask = taskService.updateTask(task);
             var taskModel = taskMapperImpl.taskToTaskModel(updatedTask);
-            return ResponseEntity.status(HttpStatus.CREATED).body(taskModel);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .body(taskModel);
         } catch (RecordNotFoundException e) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponse(e.getMessage()));
+                    .body(new ErrorResponse(e.getMessage()))
+                    ;
         }
     }
 
@@ -70,6 +73,7 @@ public class TaskController {
     }
 
     // Not working
+    @CrossOrigin
     @GetMapping("/parent/{parent_code}")
     public ResponseEntity<List<TaskModel>> getTaskByParentCode(@PathVariable("parent_code") String code) {
         var tasks = taskService.findTaskByCode(code);
@@ -77,8 +81,9 @@ public class TaskController {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(
-                taskRepository.findChildrenByTaskCode(tasks.get().getCode()).stream()
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(taskRepository.findChildrenByTaskCode(tasks.get().getCode()).stream()
                         .map(taskMapperImpl::taskToTaskModel).toList());
     }
 
