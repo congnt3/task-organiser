@@ -13,15 +13,23 @@ import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
 import Toast from 'primevue/toast';
+import ConfirmationService from 'primevue/confirmationservice';
 import ToastService from 'primevue/toastservice';
-
+import Aura from '@primevue/themes/aura';
 import '@/assets/styles.scss';
 
 const app = createApp(App);
 
 app.use(router);
-app.use(PrimeVue, { ripple: true });
+
+app.use(PrimeVue, {
+    ripple: true,
+    theme: {
+        preset: Aura
+    }
+})
 app.use(ToastService);
+app.use(ConfirmationService);
 
 app.component('AutoComplete', AutoComplete);
 app.component('Button', Button);
