@@ -1,11 +1,11 @@
 <script setup>
-import { ProductService1 } from '@/service/ProductService1';
+import { ProductService } from '@/service/ProductService';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useToast } from 'primevue/usetoast';
 import { onMounted, ref } from 'vue';
 
 onMounted(() => {
-    ProductService1.getProducts().then((data) => (products.value = data));
+    ProductService.getProducts().then((data) => (products.value = data));
 });
 
 const toast = useToast();

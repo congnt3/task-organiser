@@ -1,5 +1,5 @@
 <script setup>
-import { ProductService1 } from '@/service/ProductService1';
+import { ProductService } from '@/service/ProductService';
 import { onMounted, ref } from 'vue';
 
 const products = ref(null);
@@ -9,7 +9,7 @@ const options = ref(['list', 'grid']);
 const layout = ref('list');
 
 onMounted(() => {
-    ProductService1.getProductsSmall().then((data) => {
+    ProductService.getProductsSmall().then((data) => {
         products.value = data.slice(0, 6);
         picklistProducts.value = [data, []];
         orderlistProducts.value = data;

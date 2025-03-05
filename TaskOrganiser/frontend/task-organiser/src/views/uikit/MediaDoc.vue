@@ -1,6 +1,6 @@
 <script setup>
 import { PhotoService } from '@/service/PhotoService';
-import { ProductService1 } from '@/service/ProductService1';
+import { ProductService } from '@/service/ProductService';
 import { onMounted, ref } from 'vue';
 
 const products = ref([]);
@@ -42,7 +42,7 @@ const carouselResponsiveOptions = ref([
 ]);
 
 onMounted(() => {
-    ProductService1.getProductsSmall().then((data) => (products.value = data));
+    ProductService.getProductsSmall().then((data) => (products.value = data));
     PhotoService.getImages().then((data) => (images.value = data));
 });
 

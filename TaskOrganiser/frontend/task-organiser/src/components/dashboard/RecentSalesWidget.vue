@@ -1,5 +1,5 @@
 <script setup>
-import { ProductService1 } from '@/service/ProductService1';
+import { ProductService } from '@/service/ProductService';
 import { onMounted, ref } from 'vue';
 
 const products = ref(null);
@@ -9,7 +9,7 @@ function formatCurrency(value) {
 }
 
 onMounted(() => {
-    ProductService1.getProductsSmall().then((data) => (products.value = data));
+    ProductService.getProductsSmall().then((data) => (products.value = data));
 });
 </script>
 
