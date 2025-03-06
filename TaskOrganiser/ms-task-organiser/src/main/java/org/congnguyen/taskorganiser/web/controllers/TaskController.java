@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/tasks")
 public class TaskController {
@@ -73,7 +74,6 @@ public class TaskController {
     }
 
     // Not working
-    @CrossOrigin
     @GetMapping("/parent/{parent_code}")
     public ResponseEntity<List<TaskModel>> getTaskByParentCode(@PathVariable("parent_code") String code) {
         var tasks = taskService.findTaskByCode(code);

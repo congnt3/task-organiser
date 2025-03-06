@@ -10,7 +10,7 @@ const route = useRoute();
 
 // Create a reactive ref to store the query parameter value
 const taskModel = ref({});
-
+const taskCrudMode = ref("edit");
 const taskService = new TaskService();
 // Set the value initially
 onMounted(() => {
@@ -23,7 +23,7 @@ onMounted(() => {
     setTimeout(() => {
         loading.value = false;
         nodes.value = loadNodes(0, rows.value);
-        totalRecords.value = 1000;
+        totalRecords.value = 100;
     }, 1000);
 });
 
@@ -35,11 +35,10 @@ watch(
     }
 );
 
-
 const toast = useToast();
 const dt = ref();
 const products = ref();
-const productDialog = ref(false);
+const taskCrudDialog = ref(false);
 const deleteProductDialog = ref(false);
 const deleteProductsDialog = ref(false);
 const product = ref({});
@@ -48,20 +47,15 @@ const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
 const submitted = ref(false);
-const statuses = ref([
-    { label: "INSTOCK", value: "instock" },
-    { label: "LOWSTOCK", value: "lowstock" },
-    { label: "OUTOFSTOCK", value: "outofstock" }
-]);
 
 function openNew() {
     product.value = {};
     submitted.value = false;
-    productDialog.value = true;
+    taskCrudDialog.value = true;
 }
 
 function hideDialog() {
-    productDialog.value = false;
+    taskCrudDialog.value = false;
     submitted.value = false;
 }
 
@@ -82,14 +76,17 @@ function saveProduct() {
             toast.add({ severity: "success", summary: "Successful", detail: "Product Created", life: 3000 });
         }
 
-        productDialog.value = false;
+        taskCrudDialog.value = false;
         product.value = {};
     }
 }
 
 function editProduct(task) {
     product.value = { ...task };
-    productDialog.value = true;
+    taskCrudMode.value = "edit";
+    taskModel.value = task;
+    taskCrudDialog.value = true;
+
 }
 
 function confirmDeleteProduct(prod) {
@@ -263,8 +260,8 @@ const loadNodes = (first, rows) => {
             </TreeTable>
         </div>
 
-        <Dialog v-model:visible="productDialog" :style="{ width: '450px' }" header="Product Details" :modal="true">
-            <TaskCrud v-model="taskModel" />
+        <Dialog v-model:visible="taskCrudDialog" :style="{ width: '450px' }" header="Product Details" :modal="true">
+            <TaskCrud v-model="taskModel" v-bind:mode="taskCrudMode" />
         </Dialog>
 
         <Dialog v-model:visible="deleteProductDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">

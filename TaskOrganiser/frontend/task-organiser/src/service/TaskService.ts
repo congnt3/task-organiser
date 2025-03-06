@@ -20,7 +20,7 @@ export class TaskService {
      * @param task The task to create
      * @returns Promise with the created task
      */
-    async createTask(task: Omit<Task, "id">): Promise<Task | null> {
+    async createTask(task: Task): Promise<Task | null> {
         const response = await this.apiService.post<Task>(CREATE_TASK_ENDPOINT, task);
         return response.data || null;
     }
