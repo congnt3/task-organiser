@@ -54,11 +54,6 @@ const statuses = ref([
     { label: "OUTOFSTOCK", value: "outofstock" }
 ]);
 
-function formatCurrency(value) {
-    if (value) return value.toLocaleString("en-US", { style: "currency", currency: "USD" });
-    return;
-}
-
 function openNew() {
     product.value = {};
     submitted.value = false;
@@ -92,8 +87,8 @@ function saveProduct() {
     }
 }
 
-function editProduct(prod) {
-    product.value = { ...prod };
+function editProduct(task) {
+    product.value = { ...task };
     productDialog.value = true;
 }
 
@@ -163,43 +158,43 @@ const nodes = ref();
 const rows = ref(10);
 const loading = ref(false);
 const totalRecords = ref(0);
-const onExpand = (node) => {
-    if (!node.children) {
-        loading.value = true;
-
-        setTimeout(() => {
-            let lazyNode = { ...node };
-
-            lazyNode.children = [
-                {
-                    data: {
-                        code: lazyNode.data.code + " - 0",
-                        name: lazyNode.data.name + " - 0",
-                        status: Math.floor(Math.random() * 1000) + 1 + "kb"
-                    }
-                },
-                {
-                    data: {
-                        code: lazyNode.data.code + " - 1",
-                        name: lazyNode.data.name + " - 1",
-                        status: Math.floor(Math.random() * 1000) + 1 + "kb"
-                    }
-                }
-            ];
-
-            let newNodes = nodes.value.map(n => {
-                if (n.key === node.key) {
-                    n = lazyNode;
-                }
-
-                return n;
-            });
-
-            loading.value = false;
-            nodes.value = newNodes;
-        }, 250);
-    }
+const onExpand = async (node) => {
+    await doExpandChildren(node);
 };
+
+async function doExpandChildren(node, forceReload = false) {
+    if (node.children && !forceReload) {
+        return;
+    }
+
+    loading.value = true;
+    try {
+        // Fetch child tasks using the TaskService
+        const childTasks = await taskService.getAllTasks(node.data.code);
+
+        let lazyNode = { ...node };
+        lazyNode.children = childTasks.map(task => ({
+            key: task.code,
+            data: {
+                code: task.code,
+                name: task.name,
+                status: task.status
+            },
+            leaf: false
+        }));
+
+        node.children = lazyNode.children;
+
+        let newNodes = nodes.value;
+        nodes.value = newNodes;
+    } catch (error) {
+        console.error("Error loading child tasks:", error);
+        toast.add({ severity: "error", summary: "Error", detail: "Failed to load child tasks", life: 3000 });
+    } finally {
+        loading.value = false;
+    }
+}
+
 const onPage = (event) => {
     loading.value = true;
 
@@ -212,9 +207,9 @@ const onPage = (event) => {
 const loadNodes = (first, rows) => {
     let loadingNodes = [];
 
-    let downloadedTasks = taskService.getAllTasks(taskModel.value.parentTask).then((data) => (products.value = data))
+    taskService.getAllTasks(taskModel.value.parentTask)
+        .then((data) => (products.value = data))
         .then((tasks) => {
-
             for (let i = 0; i < tasks.length; i++) {
                 let node = tasks[i];
                 loadingNodes.push({
