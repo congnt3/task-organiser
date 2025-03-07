@@ -10,7 +10,7 @@ const route = useRoute();
 
 // Create a reactive ref to store the query parameter value
 const taskModel = ref({});
-const taskCrudMode = ref("edit");
+const taskCrudMode = ref("create");
 const taskService = new TaskService();
 // Set the value initially
 onMounted(() => {
@@ -105,6 +105,11 @@ function createChildTask(parentTask) {
     if (!parentTask) {
         return;
     }
+
+    taskModel.value = { parentTask: parentTask.code };
+    taskCrudMode.value = "create";
+    taskCrudDialog.value = true;
+
     // Here you can implement the logic to create a child task
     // For example:
     // 1. Open a dialog/modal

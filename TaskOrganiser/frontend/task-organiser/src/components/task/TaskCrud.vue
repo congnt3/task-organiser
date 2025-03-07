@@ -38,7 +38,15 @@ const onSaveClick = () => {
         return;
     }
     if (props.mode === "create") {
-        taskService.createTask(modelObj.value);
+        let reqBody=  {
+            "parentCode": modelObj.value.parentTask,
+            "code": modelObj.value.code,
+            "name": modelObj.value.name,
+            "description": modelObj.value.description,
+            "status": modelObj.value.status.code,
+            "deadline": modelObj.value.deadline
+        };
+        taskService.createTask(reqBody);
     } else {
         if (!modelObj.value.code) {
             return;
@@ -57,7 +65,7 @@ const onSaveClick = () => {
                 <div class="flex flex-col md:flex-row gap-4">
                     <div class="flex flex-wrap gap-2 w-full">
                         <label for="parent">Parent</label>
-                        <InputText id="parent" type="text" :value="modelObj?.parentTask" />
+                        <InputText id="parent" type="text" v-model="modelObj.parentTask" />
                     </div>
                     <div class="flex flex-wrap gap-2 w-full">
                         <label for="taskid">Task ID</label>

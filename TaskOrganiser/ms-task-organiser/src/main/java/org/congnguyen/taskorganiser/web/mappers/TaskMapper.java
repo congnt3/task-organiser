@@ -35,6 +35,9 @@ public abstract class TaskMapper {
 
     @Named("codesToTasks")
     protected List<Task> codesToTasks(Collection<String> codes) throws RecordNotFoundException {
+        if (codes == null) {
+            return null;
+        }
         var tasks  = new ArrayList<Task>();
         for (String code : codes) {
             var task = taskRepository.findByCode(code);

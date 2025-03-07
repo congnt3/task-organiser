@@ -58,8 +58,7 @@ public class TaskController {
         } catch (RecordNotFoundException e) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponse(e.getMessage()))
-                    ;
+                    .body(new ErrorResponse(e.getMessage()));
         }
     }
 
