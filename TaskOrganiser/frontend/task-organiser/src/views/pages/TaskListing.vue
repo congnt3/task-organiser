@@ -106,7 +106,7 @@ function createChildTask(parentTask) {
         return;
     }
 
-    taskModel.value = { parentTask: parentTask.code };
+    taskModel.value = { parentCode: parentTask.code };
     taskCrudMode.value = "create";
     taskCrudDialog.value = true;
 

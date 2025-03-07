@@ -1,5 +1,5 @@
 export interface Task {
-    parentTask: string;
+    parentCode: string;
     code: string;
     name: string;
     description?: string;

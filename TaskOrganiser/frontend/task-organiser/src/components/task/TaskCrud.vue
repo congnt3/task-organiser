@@ -5,17 +5,6 @@ import { Task } from "@/types/task.types.ts";
 
 const taskService = new TaskService();
 
-// Define props with TypeScript interface
-// interface TaskModel {
-//     mode: string;
-//     parentTask: string;
-//     code?: string;
-//     name?: string;
-//     description?: string;
-//     status?: string;
-//     deadline?: string;
-// }
-
 interface Props {
     mode: string;
 }
@@ -37,17 +26,20 @@ const onSaveClick = () => {
     if (!modelObj.value) {
         return;
     }
+
+    let reqBody = {
+        "parentCode": modelObj.value.parentCode,
+        "code": modelObj.value.code,
+        "name": modelObj.value.name,
+        "description": modelObj.value.description,
+        "status": modelObj.value.status.code,
+        "deadline": modelObj.value.deadline
+    };
+
     if (props.mode === "create") {
-        let reqBody=  {
-            "parentCode": modelObj.value.parentTask,
-            "code": modelObj.value.code,
-            "name": modelObj.value.name,
-            "description": modelObj.value.description,
-            "status": modelObj.value.status.code,
-            "deadline": modelObj.value.deadline
-        };
+
         taskService.createTask(reqBody);
-    } else {
+    } else if (props.mode === "update") {
         if (!modelObj.value.code) {
             return;
         }
@@ -60,12 +52,11 @@ const onSaveClick = () => {
 <template>
     <Fluid>
         <div class="w-full">
-            {{ modelObj }}
             <div class=" flex flex-col gap-4 w-full">
                 <div class="flex flex-col md:flex-row gap-4">
                     <div class="flex flex-wrap gap-2 w-full">
                         <label for="parent">Parent</label>
-                        <InputText id="parent" type="text" v-model="modelObj.parentTask" />
+                        <InputText id="parent" type="text" v-model="modelObj.parentCode" />
                     </div>
                     <div class="flex flex-wrap gap-2 w-full">
                         <label for="taskid">Task ID</label>
