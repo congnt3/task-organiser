@@ -19,10 +19,8 @@ const taskService = new TaskService();
 onMounted(() => {
     taskModel.value.parentTask = route.query.root || "root";
 
-    loading.value = true;
 
     setTimeout(() => {
-        loading.value = false;
         nodes.value = loadNodes(0, rows.value);
         totalRecords.value = 100;
     }, 1000);
@@ -106,13 +104,10 @@ function createId() {
 // TreeTable
 const nodes = ref();
 const rows = ref(10);
-const loading = ref(false);
 const totalRecords = ref(0);
 const onExpand = async (node) => {
-    // loading.value = true;
     await doLoadChildren(node);
     redrawTree();
-    // loading.value = false;
 };
 
 const updateTaskStatus = async (node, status) => {
@@ -135,11 +130,9 @@ const refreshNode = async (node) => {
 };
 
 const onPage = (event) => {
-    loading.value = true;
 
     //imitate delay of a backend call
     setTimeout(() => {
-        loading.value = false;
         loadNodes(event.first, rows.value);
     }, 1000);
 };
@@ -227,9 +220,14 @@ function redrawTree() {
                     <Button label="Export" icon="pi pi-upload" severity="secondary" @click="exportCSV($event)" />
                 </template>
             </Toolbar>
-            <TreeTable :value="nodes" :lazy="true" :paginator="false" :rows="rows" :loading="loading"
+            <TreeTable :value="nodes" :lazy="true" :paginator="false" :rows="rows"
                        @nodeExpand="onExpand" tableStyle="min-width: 50rem">
-                <Column field="code" header="Code" :expander="true"></Column>
+                <Column field="code" header="Code" :expander="true">
+                    <template #body="slotProps">
+                        <a :href="'/pages/crud?root=' + slotProps.node.data.code">{{slotProps.node.data.code}}</a>
+
+                    </template>
+                </Column>
                 <Column field="name" header="Name"></Column>
                 <Column field="status" header="Status">
                     <template #body="slotProps">
