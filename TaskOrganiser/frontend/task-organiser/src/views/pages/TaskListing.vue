@@ -59,34 +59,12 @@ function hideDialog() {
     submitted.value = false;
 }
 
-function saveProduct() {
-    submitted.value = true;
+async function editTask(task) {
+    taskCrudMode.value = "update";
+    let theTask = await taskService.getTask(task.code);
+    taskModel.value = theTask;
 
-    if (product?.value.name?.trim()) {
-        if (product.value.id) {
-            product.value.inventoryStatus = product.value.inventoryStatus.value ? product.value.inventoryStatus.value : product.value.inventoryStatus;
-            products.value[findIndexById(product.value.id)] = product.value;
-            toast.add({ severity: "success", summary: "Successful", detail: "Product Updated", life: 3000 });
-        } else {
-            product.value.id = createId();
-            product.value.code = createId();
-            product.value.image = "product-placeholder.svg";
-            product.value.inventoryStatus = product.value.inventoryStatus ? product.value.inventoryStatus.value : "INSTOCK";
-            products.value.push(product.value);
-            toast.add({ severity: "success", summary: "Successful", detail: "Product Created", life: 3000 });
-        }
-
-        taskCrudDialog.value = false;
-        product.value = {};
-    }
-}
-
-function editProduct(task) {
-    product.value = { ...task };
-    taskCrudMode.value = "edit";
-    taskModel.value = task;
     taskCrudDialog.value = true;
-
 }
 
 function confirmDeleteProduct(prod) {
@@ -109,26 +87,6 @@ function createChildTask(parentTask) {
     taskModel.value = { parentCode: parentTask.code };
     taskCrudMode.value = "create";
     taskCrudDialog.value = true;
-
-    // Here you can implement the logic to create a child task
-    // For example:
-    // 1. Open a dialog/modal
-    // 2. Get the new task details
-    // 3. Make API call to create child task
-    // 4. Refresh the tree table
-    console.log("Creating child task for parent:", parentTask);
-}
-
-function findIndexById(id) {
-    let index = -1;
-    for (let i = 0; i < products.value.length; i++) {
-        if (products.value[i].id === id) {
-            index = i;
-            break;
-        }
-    }
-
-    return index;
 }
 
 function createId() {
@@ -148,7 +106,7 @@ function confirmDeleteSelected() {
     deleteProductsDialog.value = true;
 }
 
-function deleteSelectedProducts() {
+function deleteSelectedTasks() {
     products.value = products.value.filter((val) => !selectedProducts.value.includes(val));
     deleteProductsDialog.value = false;
     selectedProducts.value = null;
@@ -227,7 +185,6 @@ const loadNodes = (first, rows) => {
             nodes.value = loadingNodes;
         });
 };
-
 </script>
 
 <template>
@@ -253,7 +210,7 @@ const loadNodes = (first, rows) => {
                 <Column :exportable="false" style="min-width: 12rem">
                     <template #body="slotProps">
                         <Button icon="pi pi-pencil" outlined rounded class="mr-2"
-                                @click="editProduct(slotProps.node.data)" />
+                                @click="editTask(slotProps.node.data)" />
                         <Button icon="pi pi-trash" outlined rounded severity="danger"
                                 @click="confirmDeleteProduct(slotProps.data)" />
                         <Button icon="pi pi-plus" outlined rounded class="mr-2"
@@ -265,7 +222,8 @@ const loadNodes = (first, rows) => {
             </TreeTable>
         </div>
 
-        <Dialog v-model:visible="taskCrudDialog" :style="{ width: '450px' }" header="Product Details" :modal="true">
+        <Dialog v-model:visible="taskCrudDialog" :style="{ width: '450px', 'text-transform': 'capitalize' }"
+                v-bind:header="taskCrudMode.concat(' Product Details')" :modal="true">
             <TaskCrud v-model="taskModel" v-bind:mode="taskCrudMode" />
         </Dialog>
 
@@ -273,8 +231,7 @@ const loadNodes = (first, rows) => {
             <div class="flex items-center gap-4">
                 <i class="pi pi-exclamation-triangle !text-3xl" />
                 <span v-if="product"
-                >Are you sure you want to delete <b>{{ product.name }}</b
-                >?</span
+                >Are you sure you want to delete <b>{{ product.name }}</b>?</span
                 >
             </div>
             <template #footer>
@@ -290,7 +247,7 @@ const loadNodes = (first, rows) => {
             </div>
             <template #footer>
                 <Button label="No" icon="pi pi-times" text @click="deleteProductsDialog = false" />
-                <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedProducts" />
+                <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedTasks" />
             </template>
         </Dialog>
     </div>

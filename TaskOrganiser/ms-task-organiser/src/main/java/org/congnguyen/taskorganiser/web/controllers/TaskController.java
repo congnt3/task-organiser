@@ -47,13 +47,14 @@ public class TaskController {
     }
 
     @PutMapping("/code/{code}")
-    public ResponseEntity<?> updateTask(@Validated @RequestBody CreateTaskRequest request) {
+    public ResponseEntity<?> updateTask(
+            @PathVariable("code") String code,
+            @Validated @RequestBody CreateTaskRequest request) {
         try {
             var task = taskMapperImpl.createTaskRequestToTask(request);
-            var updatedTask = taskService.updateTask(task);
+            var updatedTask = taskService.updateTask(code, task);
             var taskModel = taskMapperImpl.taskToTaskModel(updatedTask);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .header("Access-Control-Allow-Origin", "*")
+            return ResponseEntity.status(HttpStatus.OK)
                     .body(taskModel);
         } catch (RecordNotFoundException e) {
             return ResponseEntity

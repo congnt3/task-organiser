@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, withDefaults } from "vue";
+import { ref, watch } from "vue";
 import { TaskService } from "@/service/TaskService.ts";
 import { Task } from "@/types/task.types.ts";
 
@@ -37,14 +37,15 @@ const onSaveClick = () => {
     };
 
     if (props.mode === "create") {
-
         taskService.createTask(reqBody);
+        console.log(`Creating child task for parent: ${reqBody.parentCode}`);
     } else if (props.mode === "update") {
         if (!modelObj.value.code) {
+            console.log("Updating task failed. Task code is empty");
             return;
         }
-
-        taskService.updateTask(modelObj.value.code, modelObj.value);
+        console.log("Updating task:", reqBody.code);
+        taskService.updateTask(modelObj.value.code, reqBody);
     }
 };
 </script>
