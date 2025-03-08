@@ -39,8 +39,8 @@ const toast = useToast();
 const dt = ref();
 const products = ref();
 const taskCrudDialog = ref(false);
-const deleteProductDialog = ref(false);
-const deleteProductsDialog = ref(false);
+const deleteTaskDialog = ref(false);
+const deleteTasksDialog = ref(false);
 const product = ref({});
 const selectedProducts = ref();
 const filters = ref({
@@ -67,14 +67,14 @@ async function editTask(task) {
     taskCrudDialog.value = true;
 }
 
-function confirmDeleteProduct(prod) {
+function confirmDeleteTask(prod) {
     product.value = prod;
-    deleteProductDialog.value = true;
+    deleteTaskDialog.value = true;
 }
 
 function deleteProduct() {
     products.value = products.value.filter((val) => val.id !== product.value.id);
-    deleteProductDialog.value = false;
+    deleteTaskDialog.value = false;
     product.value = {};
     toast.add({severity: "success", summary: "Successful", detail: "Product Deleted", life: 3000});
 }
@@ -103,12 +103,12 @@ function exportCSV() {
 }
 
 function confirmDeleteSelected() {
-    deleteProductsDialog.value = true;
+    deleteTasksDialog.value = true;
 }
 
 function deleteSelectedTasks() {
     products.value = products.value.filter((val) => !selectedProducts.value.includes(val));
-    deleteProductsDialog.value = false;
+    deleteTasksDialog.value = false;
     selectedProducts.value = null;
     toast.add({severity: "success", summary: "Successful", detail: "Products Deleted", life: 3000});
 }
@@ -176,7 +176,6 @@ const loadNodes = (first, rows) => {
     let loadingNodes = [];
 
     taskService.getAllTasks(taskModel.value.parentTask)
-        .then((data) => (products.value = data))
         .then((tasks) => {
             for (let i = 0; i < tasks.length; i++) {
                 let node = tasks[i];
@@ -258,7 +257,7 @@ function redrawTree() {
                         <Button icon="pi pi-pencil" outlined rounded class="mr-2"
                                 @click="editTask(slotProps.node.data)"/>
                         <Button icon="pi pi-trash" outlined rounded severity="danger"
-                                @click="confirmDeleteProduct(slotProps.data)"/>
+                                @click="confirmDeleteTask(slotProps.data)"/>
                         <Button icon="pi pi-plus" outlined rounded class="mr-2"
                                 @click="createChildTask(slotProps.node.data)"
                                 :disabled="!slotProps.node.data"
@@ -269,11 +268,11 @@ function redrawTree() {
         </div>
 
         <Dialog v-model:visible="taskCrudDialog" :style="{ width: '450px', 'text-transform': 'capitalize' }"
-                v-bind:header="taskCrudMode.concat(' Product Details')" :modal="true">
+                v-bind:header="taskCrudMode.concat(' Task Details')" :modal="true">
             <TaskCrud v-model="taskModel" v-bind:mode="taskCrudMode"/>
         </Dialog>
 
-        <Dialog v-model:visible="deleteProductDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
+        <Dialog v-model:visible="deleteTaskDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
             <div class="flex items-center gap-4">
                 <i class="pi pi-exclamation-triangle !text-3xl"/>
                 <span v-if="product"
@@ -281,18 +280,18 @@ function redrawTree() {
                 >
             </div>
             <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="deleteProductDialog = false"/>
+                <Button label="No" icon="pi pi-times" text @click="deleteTaskDialog = false"/>
                 <Button label="Yes" icon="pi pi-check" @click="deleteProduct"/>
             </template>
         </Dialog>
 
-        <Dialog v-model:visible="deleteProductsDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
+        <Dialog v-model:visible="deleteTasksDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
             <div class="flex items-center gap-4">
                 <i class="pi pi-exclamation-triangle !text-3xl"/>
                 <span v-if="product">Are you sure you want to delete the selected products?</span>
             </div>
             <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="deleteProductsDialog = false"/>
+                <Button label="No" icon="pi pi-times" text @click="deleteTasksDialog = false"/>
                 <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedTasks"/>
             </template>
         </Dialog>
