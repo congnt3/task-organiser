@@ -1,12 +1,10 @@
 <script setup>
 import { TaskService } from "@/service/TaskService";
-import { FilterMatchMode } from "@primevue/core/api";
 import { useToast } from "primevue/usetoast";
 import { onMounted, ref, watch } from "vue";
 import TaskCrud from "@/components/task/TaskCrud.vue";
 import { useRoute } from "vue-router";
 import { STATUS_COMPLETED, STATUS_IN_PROGRESS, STATUS_NEW } from "@/config/task.constants";
-import { color } from "chart.js/helpers";
 
 const route = useRoute();
 
@@ -17,8 +15,7 @@ const taskCrudMode = ref("create");
 const taskService = new TaskService();
 // Set the value initially
 onMounted(() => {
-    taskModel.value.parentTask = route.query.root || "root";
-
+    taskModel.value.parentCode = route.query.root || "root";
 
     setTimeout(() => {
         nodes.value = loadNodes(0, rows.value);
@@ -30,7 +27,7 @@ onMounted(() => {
 watch(
     () => route.query.root,
     (newValue) => {
-        taskModel.value.parentTask = newValue || "root";
+        taskModel.value.parentCode = newValue || "root";
     }
 );
 
@@ -38,20 +35,10 @@ const toast = useToast();
 const taskCrudDialog = ref(false);
 const deleteTaskDialog = ref(false);
 
-// const filters = ref({
-//     global: {value: null, matchMode: FilterMatchMode.CONTAINS}
-// });
-const submitted = ref(false);
-
 function openNew() {
     taskCrudMode.value = "create";
     taskModel.value = { parentCode: route.query.root };
     taskCrudDialog.value = true;
-}
-
-function hideDialog() {
-    taskCrudDialog.value = false;
-    submitted.value = false;
 }
 
 async function editTask(task) {
@@ -82,12 +69,12 @@ function deleteTask() {
     toast.add({ severity: "success", summary: "Successful", detail: "Product Deleted", life: 3000 });
 }
 
-function createChildTask(parentTask) {
-    if (!parentTask) {
+function createChildTask(parentCode) {
+    if (!parentCode) {
         return;
     }
 
-    taskModel.value = { parentCode: parentTask.code };
+    taskModel.value = { parentCode: parentCode.code };
     taskCrudMode.value = "create";
     taskCrudDialog.value = true;
 }
@@ -140,7 +127,7 @@ const onPage = (event) => {
 const loadNodes = (first, rows) => {
     let loadingNodes = [];
 
-    taskService.getAllTasks(taskModel.value.parentTask)
+    taskService.getAllTasks(taskModel.value.parentCode)
         .then((tasks) => {
             for (let i = 0; i < tasks.length; i++) {
                 let node = tasks[i];
