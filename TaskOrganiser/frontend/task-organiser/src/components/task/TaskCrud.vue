@@ -54,7 +54,6 @@ const onSaveClick = () => {
 <template>
     <Fluid>
         <div class="w-full">
-            {{modelObj}}
             <div class=" flex flex-col gap-4 w-full">
                 <div class="flex flex-col md:flex-row gap-4">
                     <div class="flex flex-wrap gap-2 w-full">
