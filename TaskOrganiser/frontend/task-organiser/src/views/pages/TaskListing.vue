@@ -6,6 +6,7 @@ import { onMounted, ref, watch } from "vue";
 import TaskCrud from "@/components/task/TaskCrud.vue";
 import { useRoute } from "vue-router";
 import { STATUS_COMPLETED, STATUS_IN_PROGRESS, STATUS_NEW } from "@/config/task.constants";
+import { color } from "chart.js/helpers";
 
 const route = useRoute();
 
@@ -58,7 +59,10 @@ function hideDialog() {
 async function editTask(task) {
     taskCrudMode.value = "update";
     let theTask = await taskService.getTask(task.code);
-    taskModel.value = theTask;
+    taskModel.value = {
+        ...theTask
+    };
+    taskModel.value.status = { Name: theTask.status, Code: theTask.status };
 
     taskCrudDialog.value = true;
 }
@@ -223,8 +227,8 @@ function redrawTree() {
                     <Button label="Export" icon="pi pi-upload" severity="secondary" @click="exportCSV($event)" />
                 </template>
             </Toolbar>
-            <TreeTable :value="nodes" :lazy="true" :paginator="true" :rows="rows" :loading="loading"
-                       @nodeExpand="onExpand" @page="onPage" :totalRecords="totalRecords" tableStyle="min-width: 50rem">
+            <TreeTable :value="nodes" :lazy="true" :paginator="false" :rows="rows" :loading="loading"
+                       @nodeExpand="onExpand" tableStyle="min-width: 50rem">
                 <Column field="code" header="Code" :expander="true"></Column>
                 <Column field="name" header="Name"></Column>
                 <Column field="status" header="Status">

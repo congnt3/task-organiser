@@ -2,6 +2,7 @@
 import {ref} from "vue";
 import {TaskService} from "@/service/TaskService.ts";
 import {Task} from "@/types/task.types.ts";
+import { STATUS_COMPLETED, STATUS_IN_PROGRESS, STATUS_NEW } from "@/config/task.constants.ts";
 
 const taskService = new TaskService();
 
@@ -17,9 +18,9 @@ let props = withDefaults(defineProps<Props>(), {
 let modelObj = defineModel<Task>();
 
 const dropdownStates = ref([
-    { name: "New", code: "New" },
-    { name: "In Progress", code: "In Progress" },
-    { name: "Completed", code: "Completed" }
+    { name: STATUS_NEW, code: STATUS_NEW },
+    { name: STATUS_IN_PROGRESS, code: STATUS_IN_PROGRESS },
+    { name: STATUS_COMPLETED, code: STATUS_COMPLETED }
 ]);
 
 const onSaveClick = () => {
@@ -80,7 +81,7 @@ const onSaveClick = () => {
                         <Select id="status" v-model="modelObj.status" :options="dropdownStates"
                                 optionLabel="name"
                                 placeholder="Select One" class="w-full"
-                                default-value="New"></Select>
+                                default-value="1"></Select>
                     </div>
 
                     <div class="flex flex-wrap gap-2 w-full">
