@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import {ref} from "vue";
-import {TaskService} from "@/service/TaskService.ts";
-import {Task} from "@/types/task.types.ts";
+import { ref } from "vue";
+import { TaskService } from "@/service/TaskService.ts";
+import { Task } from "@/types/task.types.ts";
 import { STATUS_COMPLETED, STATUS_IN_PROGRESS, STATUS_NEW } from "@/config/task.constants.ts";
 
 const taskService = new TaskService();
+const message = ref({ visible: false, severity: "info", messageText: "" });
 
 interface Props {
     mode: string;
@@ -23,31 +24,51 @@ const dropdownStates = ref([
     { name: STATUS_COMPLETED, code: STATUS_COMPLETED }
 ]);
 
-const onSaveClick = () => {
-    if (!modelObj.value) {
-        return;
-    }
-
-    let reqBody = {
-        "parentCode": modelObj.value.parentCode,
-        "code": modelObj.value.code,
-        "name": modelObj.value.name,
-        "description": modelObj.value.description,
-        "status": modelObj.value.status,
-        "deadline": modelObj.value.deadline
-    };
-
-    if (props.mode === "create") {
-        taskService.createTask(reqBody);
-        console.log(`Creating child task for parent: ${reqBody.parentCode}`);
-    } else if (props.mode === "update") {
-        if (!modelObj.value.code) {
-            console.log("Updating task failed. Task code is empty");
+const onSaveClick = async () => {
+    try {
+        if (!modelObj.value) {
+            showMessage("info", "Nothing saved");
             return;
         }
-        console.log("Updating task:", reqBody.code);
-        taskService.updateTask(modelObj.value.code, reqBody);
+
+        let reqBody = {
+            "parentCode": modelObj.value.parentCode,
+            "code": modelObj.value.code,
+            "name": modelObj.value.name,
+            "description": modelObj.value.description,
+            "status": modelObj.value.status,
+            "deadline": modelObj.value.deadline
+        };
+
+        if (props.mode === "create") {
+            let updateResult = await taskService.createTask(reqBody);
+            if (updateResult) {
+                modelObj.value = { parentCode: modelObj.value.parentCode };
+                console.log(`Creating child task for parent: ${reqBody.parentCode}`);
+                showMessage("success", "Task saved");
+            } else throw new Error(`Failed to save record: "${modelObj.value.code || ''}"`);
+        } else if (props.mode === "update") {
+            if (!modelObj.value.code) {
+                console.log("Updating task failed. Task code is empty");
+                return;
+            }
+
+            let updateResult = await taskService.updateTask(modelObj.value.code, reqBody);
+            if (updateResult) {
+                showMessage("success", "Task saved");
+            } else throw new Error(`Failed to save record: "${modelObj.value.code  || ''}"`);
+        }
+    } catch (ex) {
+        showMessage("warn", `${ex}`);
     }
+};
+
+const showMessage = (severity: string, messageText: string) => {
+    message.value = {
+        visible: true,
+        severity: severity,
+        messageText: messageText
+    };
 };
 </script>
 
@@ -55,6 +76,7 @@ const onSaveClick = () => {
     <Fluid>
         <div class="w-full">
             <div class=" flex flex-col gap-4 w-full">
+                <Message :severity="message.severity" v-if="message.visible">{{ message.messageText }}</Message>
                 <div class="flex flex-col md:flex-row gap-4">
                     <div class="flex flex-wrap gap-2 w-full">
                         <label for="parent">Parent</label>
@@ -92,7 +114,7 @@ const onSaveClick = () => {
                 </div>
                 <div class="flex flex-col md:flex-row gap-4">
                     <Button label="Save" icon="pi pi-check" @click="onSaveClick" />
-                    <Button label="Save As New" icon="pi pi-check" @click="" />
+                    <Button label="Save As New" v-if="props.mode!='create'" icon="pi pi-check" @click="" />
                 </div>
             </div>
         </div>

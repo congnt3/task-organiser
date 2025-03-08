@@ -1,10 +1,10 @@
 export interface Task {
     parentCode: string;
-    code: string;
-    name: string;
+    code?: string;
+    name?: string;
     description?: string;
-    status: string;
-    deadline: Date;
+    status?: string;
+    deadline?: Date;
     createdAt?: Date;
     updatedAt?: Date;
 }
