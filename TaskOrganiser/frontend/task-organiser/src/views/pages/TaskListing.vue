@@ -62,7 +62,7 @@ async function editTask(task) {
     taskModel.value = {
         ...theTask
     };
-    taskModel.value.status = { Name: theTask.status, Code: theTask.status };
+    taskModel.value.status = theTask.status;
 
     taskCrudDialog.value = true;
 }

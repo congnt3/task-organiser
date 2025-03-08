@@ -80,8 +80,8 @@ const onSaveClick = () => {
                         <label for="status">Status</label>
                         <Select id="status" v-model="modelObj.status" :options="dropdownStates"
                                 optionLabel="name"
-                                placeholder="Select One" class="w-full"
-                                default-value="1"></Select>
+                                optionValue="code"
+                                placeholder="Select One" class="w-full"></Select>
                     </div>
 
                     <div class="flex flex-wrap gap-2 w-full">
