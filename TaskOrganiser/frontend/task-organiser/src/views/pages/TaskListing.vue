@@ -229,7 +229,7 @@ function redrawTree() {
                 <Column field="name" header="Name"></Column>
                 <Column field="status" header="Status">
                 </Column>
-                <Column :exportable="false" style="min-width: 12rem">
+                <Column :exportable="false" style="min-width: 12rem" header="Set Status">
                     <template #body="slotProps">
                         <Button icon="pi pi-play" outlined rounded class="mr-2"
                                 @click="updateTaskStatus(slotProps.node, STATUS_IN_PROGRESS)"
