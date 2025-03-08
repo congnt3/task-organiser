@@ -95,14 +95,20 @@ public class TaskController {
     // Not working
     @GetMapping("/parent/{parent_code}")
     public ResponseEntity<List<TaskModel>> getTaskByParentCode(@PathVariable("parent_code") String code) {
-        var tasks = taskService.findTaskByCode(code);
-        if (tasks.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+        List<Task> result = null;
+        if ("root".equalsIgnoreCase(code)) {
+            result = taskRepository.findTopLevelTasks();
+        } else {
+            var tasks = taskService.findTaskByCode(code);
+            if (tasks.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
 
+            result = taskRepository.findChildrenByTaskCode(tasks.get().getCode());
+        }
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(taskRepository.findChildrenByTaskCode(tasks.get().getCode()).stream()
+                .body(result.stream()
                         .map(taskMapperImpl::taskToTaskModel).toList());
     }
 

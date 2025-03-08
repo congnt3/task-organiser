@@ -17,7 +17,7 @@ const taskCrudMode = ref("create");
 const taskService = new TaskService();
 // Set the value initially
 onMounted(() => {
-    taskModel.value.parentTask = route.query.root || undefined;
+    taskModel.value.parentTask = route.query.root || "root";
 
     loading.value = true;
 
@@ -32,7 +32,7 @@ onMounted(() => {
 watch(
     () => route.query.root,
     (newValue) => {
-        taskModel.value.parentTask = newValue || null;
+        taskModel.value.parentTask = newValue || "root";
     }
 );
 

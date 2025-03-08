@@ -21,4 +21,5 @@ public interface TaskRepository extends Neo4jRepository<Task, String> {
 
     @Query("MATCH (c:Task) WHERE NOT ()<-[:memberOf]-(c) RETURN c")
     List<Task> findTopLevelTasks();
+
 }
