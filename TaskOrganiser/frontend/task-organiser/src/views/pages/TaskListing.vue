@@ -193,6 +193,17 @@ function redrawTree() {
     let newNodes = nodes.value;
     nodes.value = newNodes;
 }
+
+function tagValue(task) {
+    switch (task.status) {
+        case STATUS_COMPLETED:
+            return "success";
+        case STATUS_IN_PROGRESS:
+            return "info";
+        case STATUS_NEW:
+            return "warn";
+    }
+}
 </script>
 
 <template>
@@ -211,19 +222,15 @@ function redrawTree() {
                        @nodeExpand="onExpand" tableStyle="min-width: 50rem">
                 <Column field="code" header="Code" :expander="true">
                     <template #body="slotProps">
-                        <a :href="'/pages/crud?root=' + slotProps.node.data.code">{{slotProps.node.data.code}}</a>
+                        <a :href="'/pages/crud?root=' + slotProps.node.data.code">{{ slotProps.node.data.code }}</a>
 
                     </template>
                 </Column>
                 <Column field="name" header="Name"></Column>
                 <Column field="status" header="Status">
                     <template #body="slotProps">
-                        <p v-if="slotProps.node.data.status == STATUS_COMPLETED" style="color: green">
-                            {{ slotProps.node.data.status }}</p>
-                        <p v-if="slotProps.node.data.status == STATUS_IN_PROGRESS" style="color: orange">
-                            {{ slotProps.node.data.status }}</p>
-                        <p v-if="slotProps.node.data.status == STATUS_NEW" style="color: blue;">
-                            {{ slotProps.node.data.status }}</p>
+                        <Tag :severity="tagValue(slotProps.node.data)"
+                             :value="slotProps.node.data.status"></Tag>
                     </template>
                 </Column>
                 <Column :exportable="false" style="min-width: 12rem" header="Set Status">
