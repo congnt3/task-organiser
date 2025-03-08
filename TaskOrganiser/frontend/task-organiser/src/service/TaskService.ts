@@ -5,7 +5,7 @@ import {
     CREATE_TASK_ENDPOINT,
     UPDATE_TASK_ENDPOINT,
     RETRIEVE_TASK_ENDPOINT,
-    DELETE_TASK_ENDPOINT, RETRIEVE_TASKS_BY_PARENT_ENDPOINT
+    DELETE_TASK_ENDPOINT, RETRIEVE_TASKS_BY_PARENT_ENDPOINT, PATCH_TASK_STATUS_ENDPOINT
 } from "../config/api.config";
 
 export class TaskService {
@@ -52,6 +52,12 @@ export class TaskService {
      */
     async updateTask(code: string, task: Partial<Task>): Promise<Task | null> {
         const response = await this.apiService.put<Task>(UPDATE_TASK_ENDPOINT.replace("{{code}}", code), task);
+        return response.data || null;
+    }
+
+    async updateTaskStatus(code: string, status: string): Promise<Task | null> {
+        const task = { status: status };
+        const response = await this.apiService.patch<Task>(PATCH_TASK_STATUS_ENDPOINT.replace("{{code}}", code), task);
         return response.data || null;
     }
 

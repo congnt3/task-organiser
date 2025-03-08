@@ -63,6 +63,25 @@ public class TaskController {
         }
     }
 
+    @PatchMapping("/code/{code}/status")
+    public ResponseEntity<?> updateTaskStatus(
+            @PathVariable("code") String code,
+            @RequestBody CreateTaskRequest request) {
+        try {
+            var task = taskService.getTaskByCode(code);
+            task.setStatus(request.getStatus());
+
+            var updatedTask = taskService.updateTask(code, task);
+            var taskModel = taskMapperImpl.taskToTaskModel(updatedTask);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(taskModel);
+        } catch (RecordNotFoundException e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
     @GetMapping("/code/{code}")
     public ResponseEntity<TaskModel> getTaskByCode(@PathVariable("code") String code) {
         try {
