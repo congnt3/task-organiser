@@ -87,6 +87,19 @@ public class TaskController {
                         .map(taskMapperImpl::taskToTaskModel).toList());
     }
 
+    @DeleteMapping("/code/{code}")
+    public ResponseEntity<TaskModel> deleteTaskByCode(@PathVariable("code") String code) {
+        try {
+            Task task = taskService.getTaskByCode(code);
+            taskRepository.deleteById(code);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(taskMapperImpl.taskToTaskModel(task));
+        } catch (RecordNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @GetMapping("/")
     public ResponseEntity<List<TaskModel>> getTopLevelTasks() {
         return ResponseEntity.ok(

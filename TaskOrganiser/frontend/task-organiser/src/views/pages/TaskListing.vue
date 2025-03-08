@@ -10,13 +10,12 @@ const route = useRoute();
 
 // Create a reactive ref to store the query parameter value
 const taskModel = ref({});
+const taskDeleting = ref({});
 const taskCrudMode = ref("create");
 const taskService = new TaskService();
 // Set the value initially
 onMounted(() => {
     taskModel.value.parentTask = route.query.root || undefined;
-
-    taskService.getAllTasks(taskModel.value.parentTask).then((data) => (products.value = data));
 
     loading.value = true;
 
@@ -36,16 +35,12 @@ watch(
 );
 
 const toast = useToast();
-const dt = ref();
-const products = ref();
 const taskCrudDialog = ref(false);
 const deleteTaskDialog = ref(false);
-const deleteTasksDialog = ref(false);
-const product = ref({});
-const selectedProducts = ref();
-const filters = ref({
-    global: {value: null, matchMode: FilterMatchMode.CONTAINS}
-});
+
+// const filters = ref({
+//     global: {value: null, matchMode: FilterMatchMode.CONTAINS}
+// });
 const submitted = ref(false);
 
 function openNew() {
@@ -67,15 +62,20 @@ async function editTask(task) {
     taskCrudDialog.value = true;
 }
 
-function confirmDeleteTask(prod) {
-    product.value = prod;
+function confirmDeleteTask(task) {
+    taskDeleting.value = task;
     deleteTaskDialog.value = true;
 }
 
-function deleteProduct() {
-    products.value = products.value.filter((val) => val.id !== product.value.id);
+function deleteTask() {
+    try {
+        taskService.deleteTask(taskDeleting.value.code);
+    } catch (error) {
+        console.error("Error deleting task:", error);
+        toast.add({severity: "error", summary: "Error", detail: "Failed to delete task", life: 3000});
+    }
+    taskDeleting.value = {};
     deleteTaskDialog.value = false;
-    product.value = {};
     toast.add({severity: "success", summary: "Successful", detail: "Product Deleted", life: 3000});
 }
 
@@ -98,21 +98,6 @@ function createId() {
     return id;
 }
 
-function exportCSV() {
-    dt.value.exportCSV();
-}
-
-function confirmDeleteSelected() {
-    deleteTasksDialog.value = true;
-}
-
-function deleteSelectedTasks() {
-    products.value = products.value.filter((val) => !selectedProducts.value.includes(val));
-    deleteTasksDialog.value = false;
-    selectedProducts.value = null;
-    toast.add({severity: "success", summary: "Successful", detail: "Products Deleted", life: 3000});
-}
-
 // TreeTable
 const nodes = ref();
 const rows = ref(10);
@@ -132,34 +117,6 @@ const refreshNode = async (node) => {
     }
 
     redrawTree();
-}
-
-async function doLoadChildren(node, forceReload = false) {
-    if (node.children && !forceReload) {
-        return;
-    }
-
-    try {
-        // Fetch child tasks using the TaskService
-        const childTasks = await taskService.getAllTasks(node.data.code);
-
-        let lazyNode = {...node};
-        lazyNode.children = childTasks.map(task => ({
-            key: task.code,
-            data: {
-                code: task.code,
-                name: task.name,
-                status: task.status
-            },
-            leaf: false
-        }));
-
-        node.children = lazyNode.children;
-
-    } catch (error) {
-        console.error("Error loading child tasks:", error);
-        toast.add({severity: "error", summary: "Error", detail: "Failed to load child tasks", life: 3000});
-    }
 }
 
 const onPage = (event) => {
@@ -209,6 +166,34 @@ async function reloadANode(node) {
     }
 }
 
+async function doLoadChildren(node, forceReload = false) {
+    if (node.children && !forceReload) {
+        return;
+    }
+
+    try {
+        // Fetch child tasks using the TaskService
+        const childTasks = await taskService.getAllTasks(node.data.code);
+
+        let lazyNode = {...node};
+        lazyNode.children = childTasks.map(task => ({
+            key: task.code,
+            data: {
+                code: task.code,
+                name: task.name,
+                status: task.status
+            },
+            leaf: false
+        }));
+
+        node.children = lazyNode.children;
+
+    } catch (error) {
+        console.error("Error loading child tasks:", error);
+        toast.add({severity: "error", summary: "Error", detail: "Failed to load child tasks", life: 3000});
+    }
+}
+
 function redrawTree() {
     let newNodes = nodes.value;
     nodes.value = newNodes;
@@ -221,8 +206,6 @@ function redrawTree() {
             <Toolbar class="mb-6">
                 <template #start>
                     <Button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" @click="openNew"/>
-                    <Button label="Delete" icon="pi pi-trash" severity="secondary" @click="confirmDeleteSelected"
-                            :disabled="!selectedProducts || !selectedProducts.length"/>
                 </template>
 
                 <template #end>
@@ -257,7 +240,7 @@ function redrawTree() {
                         <Button icon="pi pi-pencil" outlined rounded class="mr-2"
                                 @click="editTask(slotProps.node.data)"/>
                         <Button icon="pi pi-trash" outlined rounded severity="danger"
-                                @click="confirmDeleteTask(slotProps.data)"/>
+                                @click="confirmDeleteTask(slotProps.node.data)"/>
                         <Button icon="pi pi-plus" outlined rounded class="mr-2"
                                 @click="createChildTask(slotProps.node.data)"
                                 :disabled="!slotProps.node.data"
@@ -272,27 +255,15 @@ function redrawTree() {
             <TaskCrud v-model="taskModel" v-bind:mode="taskCrudMode"/>
         </Dialog>
 
-        <Dialog v-model:visible="deleteTaskDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
+        <Dialog v-model:visible="deleteTaskDialog" :style="{ width: '450px' }" header="Confirm deletion" :modal="true">
             <div class="flex items-center gap-4">
                 <i class="pi pi-exclamation-triangle !text-3xl"/>
-                <span v-if="product"
-                >Are you sure you want to delete <b>{{ product.name }}</b>?</span
-                >
+                <span v-if="taskDeleting">
+                    Are you sure you want to delete <b>{{ taskDeleting.code }}</b> - {{ taskDeleting.name }}?</span>
             </div>
             <template #footer>
                 <Button label="No" icon="pi pi-times" text @click="deleteTaskDialog = false"/>
-                <Button label="Yes" icon="pi pi-check" @click="deleteProduct"/>
-            </template>
-        </Dialog>
-
-        <Dialog v-model:visible="deleteTasksDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
-            <div class="flex items-center gap-4">
-                <i class="pi pi-exclamation-triangle !text-3xl"/>
-                <span v-if="product">Are you sure you want to delete the selected products?</span>
-            </div>
-            <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="deleteTasksDialog = false"/>
-                <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedTasks"/>
+                <Button label="Yes" icon="pi pi-check" @click="deleteTask"/>
             </template>
         </Dialog>
     </div>
