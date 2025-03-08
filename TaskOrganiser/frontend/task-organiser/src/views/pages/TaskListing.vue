@@ -5,7 +5,7 @@ import { useToast } from "primevue/usetoast";
 import { onMounted, ref, watch } from "vue";
 import TaskCrud from "@/components/task/TaskCrud.vue";
 import { useRoute } from "vue-router";
-import { STATUS_COMPLETED, STATUS_IN_PROGRESS } from "@/config/task.constants";
+import { STATUS_COMPLETED, STATUS_IN_PROGRESS, STATUS_NEW } from "@/config/task.constants";
 
 const route = useRoute();
 
@@ -228,6 +228,14 @@ function redrawTree() {
                 <Column field="code" header="Code" :expander="true"></Column>
                 <Column field="name" header="Name"></Column>
                 <Column field="status" header="Status">
+                    <template #body="slotProps">
+                        <p v-if="slotProps.node.data.status == STATUS_COMPLETED" style="color: green">
+                            {{ slotProps.node.data.status }}</p>
+                        <p v-if="slotProps.node.data.status == STATUS_IN_PROGRESS" style="color: orange">
+                            {{ slotProps.node.data.status }}</p>
+                        <p v-if="slotProps.node.data.status == STATUS_NEW" style="color: blue;">
+                            {{ slotProps.node.data.status }}</p>
+                    </template>
                 </Column>
                 <Column :exportable="false" style="min-width: 12rem" header="Set Status">
                     <template #body="slotProps">
