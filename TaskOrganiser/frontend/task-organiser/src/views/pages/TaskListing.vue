@@ -223,7 +223,6 @@ function tagValue(task) {
                 <Column field="code" header="Code" :expander="true">
                     <template #body="slotProps">
                         <a :href="'/pages/crud?root=' + slotProps.node.data.code">{{ slotProps.node.data.code }}</a>
-
                     </template>
                 </Column>
                 <Column field="name" header="Name"></Column>
@@ -265,7 +264,7 @@ function tagValue(task) {
             </TreeTable>
         </div>
 
-        <Dialog v-model:visible="taskCrudDialog" :style="{ width: '450px', 'text-transform': 'capitalize' }"
+        <Dialog v-model:visible="taskCrudDialog" class="capitalize" :style="{ width: '450px' }"
                 v-bind:header="taskCrudMode.concat(' Task Details')" :modal="true">
             <TaskCrud v-model="taskModel" v-bind:mode="taskCrudMode" />
         </Dialog>
