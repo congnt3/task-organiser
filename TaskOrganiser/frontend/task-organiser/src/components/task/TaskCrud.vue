@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
-import { TaskService } from "@/service/TaskService.ts";
-import { Task } from "@/types/task.types.ts";
+import {ref} from "vue";
+import {TaskService} from "@/service/TaskService.ts";
+import {Task} from "@/types/task.types.ts";
 
 const taskService = new TaskService();
 

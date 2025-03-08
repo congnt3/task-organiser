@@ -1,10 +1,10 @@
 <script setup>
-import { TaskService } from "@/service/TaskService";
-import { FilterMatchMode } from "@primevue/core/api";
-import { useToast } from "primevue/usetoast";
-import { onMounted, ref, watch } from "vue";
+import {TaskService} from "@/service/TaskService";
+import {FilterMatchMode} from "@primevue/core/api";
+import {useToast} from "primevue/usetoast";
+import {onMounted, ref, watch} from "vue";
 import TaskCrud from "@/components/task/TaskCrud.vue";
-import { useRoute } from "vue-router";
+import {useRoute} from "vue-router";
 
 const route = useRoute();
 
@@ -14,7 +14,7 @@ const taskCrudMode = ref("create");
 const taskService = new TaskService();
 // Set the value initially
 onMounted(() => {
-    taskModel.value.parentTask = route.query.parentTask || undefined;
+    taskModel.value.parentTask = route.query.root || undefined;
 
     taskService.getAllTasks(taskModel.value.parentTask).then((data) => (products.value = data));
 
@@ -29,7 +29,7 @@ onMounted(() => {
 
 // Watch for URL query parameter changes
 watch(
-    () => route.query.parentTask,
+    () => route.query.root,
     (newValue) => {
         taskModel.value.parentTask = newValue || null;
     }
@@ -44,13 +44,13 @@ const deleteProductsDialog = ref(false);
 const product = ref({});
 const selectedProducts = ref();
 const filters = ref({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS }
+    global: {value: null, matchMode: FilterMatchMode.CONTAINS}
 });
 const submitted = ref(false);
 
 function openNew() {
-    product.value = {};
-    submitted.value = false;
+    taskCrudMode.value = "create";
+    taskModel.value = {parentCode: route.query.root}
     taskCrudDialog.value = true;
 }
 
@@ -76,7 +76,7 @@ function deleteProduct() {
     products.value = products.value.filter((val) => val.id !== product.value.id);
     deleteProductDialog.value = false;
     product.value = {};
-    toast.add({ severity: "success", summary: "Successful", detail: "Product Deleted", life: 3000 });
+    toast.add({severity: "success", summary: "Successful", detail: "Product Deleted", life: 3000});
 }
 
 function createChildTask(parentTask) {
@@ -84,7 +84,7 @@ function createChildTask(parentTask) {
         return;
     }
 
-    taskModel.value = { parentCode: parentTask.code };
+    taskModel.value = {parentCode: parentTask.code};
     taskCrudMode.value = "create";
     taskCrudDialog.value = true;
 }
@@ -110,7 +110,7 @@ function deleteSelectedTasks() {
     products.value = products.value.filter((val) => !selectedProducts.value.includes(val));
     deleteProductsDialog.value = false;
     selectedProducts.value = null;
-    toast.add({ severity: "success", summary: "Successful", detail: "Products Deleted", life: 3000 });
+    toast.add({severity: "success", summary: "Successful", detail: "Products Deleted", life: 3000});
 }
 
 // TreeTable
@@ -119,20 +119,31 @@ const rows = ref(10);
 const loading = ref(false);
 const totalRecords = ref(0);
 const onExpand = async (node) => {
-    await doExpandChildren(node);
+    // loading.value = true;
+    await doLoadChildren(node);
+    redrawTree();
+    // loading.value = false;
 };
 
-async function doExpandChildren(node, forceReload = false) {
+const refreshNode = async (node) => {
+    await reloadANode(node);
+    if (node.data.children) {
+        await doLoadChildren(node, true);
+    }
+
+    redrawTree();
+}
+
+async function doLoadChildren(node, forceReload = false) {
     if (node.children && !forceReload) {
         return;
     }
 
-    loading.value = true;
     try {
         // Fetch child tasks using the TaskService
         const childTasks = await taskService.getAllTasks(node.data.code);
 
-        let lazyNode = { ...node };
+        let lazyNode = {...node};
         lazyNode.children = childTasks.map(task => ({
             key: task.code,
             data: {
@@ -145,13 +156,9 @@ async function doExpandChildren(node, forceReload = false) {
 
         node.children = lazyNode.children;
 
-        let newNodes = nodes.value;
-        nodes.value = newNodes;
     } catch (error) {
         console.error("Error loading child tasks:", error);
-        toast.add({ severity: "error", summary: "Error", detail: "Failed to load child tasks", life: 3000 });
-    } finally {
-        loading.value = false;
+        toast.add({severity: "error", summary: "Error", detail: "Failed to load child tasks", life: 3000});
     }
 }
 
@@ -164,6 +171,7 @@ const onPage = (event) => {
         loadNodes(event.first, rows.value);
     }, 1000);
 };
+
 const loadNodes = (first, rows) => {
     let loadingNodes = [];
 
@@ -185,6 +193,27 @@ const loadNodes = (first, rows) => {
             nodes.value = loadingNodes;
         });
 };
+
+/*
+Reload the node and its children
+ */
+async function reloadANode(node) {
+    try {
+        // Fetch child tasks using the TaskService
+        const task = await taskService.getTask(node.data.code);
+
+        node.data = task;
+
+    } catch (error) {
+        console.error("Error loading task:", error);
+        toast.add({severity: "error", summary: "Error", detail: "Failed to load task", life: 3000});
+    }
+}
+
+function redrawTree() {
+    let newNodes = nodes.value;
+    nodes.value = newNodes;
+}
 </script>
 
 <template>
@@ -192,13 +221,13 @@ const loadNodes = (first, rows) => {
         <div class="card">
             <Toolbar class="mb-6">
                 <template #start>
-                    <Button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" @click="openNew" />
+                    <Button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" @click="openNew"/>
                     <Button label="Delete" icon="pi pi-trash" severity="secondary" @click="confirmDeleteSelected"
-                            :disabled="!selectedProducts || !selectedProducts.length" />
+                            :disabled="!selectedProducts || !selectedProducts.length"/>
                 </template>
 
                 <template #end>
-                    <Button label="Export" icon="pi pi-upload" severity="secondary" @click="exportCSV($event)" />
+                    <Button label="Export" icon="pi pi-upload" severity="secondary" @click="exportCSV($event)"/>
                 </template>
             </Toolbar>
             <TreeTable :value="nodes" :lazy="true" :paginator="true" :rows="rows" :loading="loading"
@@ -209,14 +238,31 @@ const loadNodes = (first, rows) => {
                 </Column>
                 <Column :exportable="false" style="min-width: 12rem">
                     <template #body="slotProps">
+                        <Button icon="pi pi-play" outlined rounded class="mr-2"
+                                @click="markComplete(slotProps.node.data)"
+                                :disabled="!slotProps.node.data"
+                                tooltip="Mark as In Progress"/>
+                        <Button icon="pi pi-check" outlined rounded class="mr-2"
+                                @click="markComplete(slotProps.node.data)"
+                                :disabled="!slotProps.node.data"
+                                tooltip="Mark as Completed"/>
+                    </template>
+
+                </Column>
+                <Column :exportable="false" style="min-width: 12rem">
+                    <template #body="slotProps">
+                        <Button icon="pi pi-refresh" outlined rounded class="mr-2"
+                                @click="refreshNode(slotProps.node)"
+                                :disabled="!slotProps.node.data"
+                                tooltip="Reload the node data"/>
                         <Button icon="pi pi-pencil" outlined rounded class="mr-2"
-                                @click="editTask(slotProps.node.data)" />
+                                @click="editTask(slotProps.node.data)"/>
                         <Button icon="pi pi-trash" outlined rounded severity="danger"
-                                @click="confirmDeleteProduct(slotProps.data)" />
+                                @click="confirmDeleteProduct(slotProps.data)"/>
                         <Button icon="pi pi-plus" outlined rounded class="mr-2"
                                 @click="createChildTask(slotProps.node.data)"
                                 :disabled="!slotProps.node.data"
-                                tooltip="Create Child Task" />
+                                tooltip="Create Child Task"/>
                     </template>
                 </Column>
             </TreeTable>
@@ -224,30 +270,30 @@ const loadNodes = (first, rows) => {
 
         <Dialog v-model:visible="taskCrudDialog" :style="{ width: '450px', 'text-transform': 'capitalize' }"
                 v-bind:header="taskCrudMode.concat(' Product Details')" :modal="true">
-            <TaskCrud v-model="taskModel" v-bind:mode="taskCrudMode" />
+            <TaskCrud v-model="taskModel" v-bind:mode="taskCrudMode"/>
         </Dialog>
 
         <Dialog v-model:visible="deleteProductDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
             <div class="flex items-center gap-4">
-                <i class="pi pi-exclamation-triangle !text-3xl" />
+                <i class="pi pi-exclamation-triangle !text-3xl"/>
                 <span v-if="product"
                 >Are you sure you want to delete <b>{{ product.name }}</b>?</span
                 >
             </div>
             <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="deleteProductDialog = false" />
-                <Button label="Yes" icon="pi pi-check" @click="deleteProduct" />
+                <Button label="No" icon="pi pi-times" text @click="deleteProductDialog = false"/>
+                <Button label="Yes" icon="pi pi-check" @click="deleteProduct"/>
             </template>
         </Dialog>
 
         <Dialog v-model:visible="deleteProductsDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
             <div class="flex items-center gap-4">
-                <i class="pi pi-exclamation-triangle !text-3xl" />
+                <i class="pi pi-exclamation-triangle !text-3xl"/>
                 <span v-if="product">Are you sure you want to delete the selected products?</span>
             </div>
             <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="deleteProductsDialog = false" />
-                <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedTasks" />
+                <Button label="No" icon="pi pi-times" text @click="deleteProductsDialog = false"/>
+                <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedTasks"/>
             </template>
         </Dialog>
     </div>
