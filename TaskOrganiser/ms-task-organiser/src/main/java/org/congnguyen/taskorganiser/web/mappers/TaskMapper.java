@@ -1,5 +1,6 @@
 package org.congnguyen.taskorganiser.web.mappers;
 
+import org.apache.commons.lang3.StringUtils;
 import org.congnguyen.taskorganiser.persistence.models.Task;
 import org.congnguyen.taskorganiser.persistence.repositories.TaskRepository;
 import org.congnguyen.taskorganiser.persistence.exceptions.RecordNotFoundException;
@@ -29,6 +30,10 @@ public abstract class TaskMapper {
 
     @Named("codeToTask")
     protected Task stringToTask(String code) throws RecordNotFoundException {
+        if (!StringUtils.isNotEmpty(code)) {
+            return null;
+        }
+
         return taskRepository.findByCode(code)
                 .orElseThrow(() -> new RecordNotFoundException(String.format("Task with code %s not found", code)));
     }
@@ -38,7 +43,7 @@ public abstract class TaskMapper {
         if (codes == null) {
             return null;
         }
-        var tasks  = new ArrayList<Task>();
+        var tasks = new ArrayList<Task>();
         for (String code : codes) {
             var task = taskRepository.findByCode(code);
             if (!task.isPresent()) {
