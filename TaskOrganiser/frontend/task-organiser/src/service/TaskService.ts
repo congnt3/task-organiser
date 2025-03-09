@@ -5,7 +5,11 @@ import {
     CREATE_TASK_ENDPOINT,
     UPDATE_TASK_ENDPOINT,
     RETRIEVE_TASK_ENDPOINT,
-    DELETE_TASK_ENDPOINT, RETRIEVE_TASKS_BY_PARENT_ENDPOINT, PATCH_TASK_STATUS_ENDPOINT, REMOVE_DEPENDENCY_ENDPOINT
+    DELETE_TASK_ENDPOINT,
+    RETRIEVE_TASKS_BY_PARENT_ENDPOINT,
+    PATCH_TASK_STATUS_ENDPOINT,
+    REMOVE_DEPENDENCY_ENDPOINT,
+    ADD_DEPENDENCIES_ENDPOINT
 } from "../config/api.config";
 
 export class TaskService {
@@ -77,5 +81,12 @@ export class TaskService {
                 .replace("{{code}}", code)
                 .replace("{{dependsOn}}", dependsOn));
         return response.status === 200;
+    }
+
+    async addDependencies(code: string, dependsOn: string){
+        const response = await this.apiService.post<Task>(
+            ADD_DEPENDENCIES_ENDPOINT
+                .replace("{{code}}", code), [dependsOn]);
+        return response;
     }
 }

@@ -17,7 +17,7 @@ let props = withDefaults(defineProps<Props>(), {
 
 // Define the props with defaults
 let modelObj = defineModel<Task>();
-
+let searchBoxModel = ref({ searchText: "", result: [] });
 const dropdownStates = ref([
     { name: STATUS_NEW, code: STATUS_NEW },
     { name: STATUS_IN_PROGRESS, code: STATUS_IN_PROGRESS },
@@ -71,17 +71,30 @@ const showMessage = (severity: string, messageText: string) => {
     };
 };
 
-const removeDependency = (data) => {
+const removeDependency = async (data) => {
     console.log(data);
     if (!(modelObj.value?.code && data.code)) {
         showMessage("warn", "No data available.");
         return;
     }
 
-    taskService.removeDependency(modelObj.value?.code, data.code);
+    await taskService.removeDependency(modelObj.value?.code, data.code);
 };
 
-const addDependency = () => {
+const startSearch = async () => {
+    let searchResult = await taskService.getTask(searchBoxModel.value.searchText);
+    if (searchResult) {
+        searchBoxModel.value.result = [searchResult];
+    }
+};
+const addToDependency = async (data: Task) => {
+    if (!data.code) {
+        showMessage("warn", "No data available.");
+        return;
+    }
+
+    await taskService.addDependencies(modelObj.value?.code, data.code);
+
 };
 </script>
 
@@ -128,6 +141,31 @@ const addDependency = () => {
                 <br />
                 <div class="flex justify-between">
                     <p class="font-bold">Predecessors</p>
+                </div>
+                <div class="flex flex-col gap-4">
+                    <InputGroup>
+                        <InputText id="searchText" type="text" v-model="searchBoxModel.searchText" />
+                        <Button label="Search" @click="startSearch" />
+                    </InputGroup>
+                </div>
+                <div class="flex flex-col gap-4">
+
+                    <DataTable
+                        :value="searchBoxModel.result"
+                        :rows="10"
+                        dataKey="code">
+                        <template #empty> Nothing here.</template>
+                        <Column field="code" header="Code"></Column>
+                        <Column field="name" header="Name"></Column>
+                        <Column field="status" header="Status"></Column>
+                        <Column :exportable="false" style="min-width: 12rem">
+                            <template #body="{ data }">
+                                <Button icon="pi pi-arrow-right" outlined rounded severity="success"
+                                        @click="addToDependency(data)" label="Add">
+                                </Button>
+                            </template>
+                        </Column>
+                    </DataTable>
                 </div>
                 <div class="flex flex-col gap-4">
                     <DataTable
