@@ -74,18 +74,9 @@ function createChildTask(parentCode) {
         return;
     }
 
-    taskModel.value = { parentCode: parentCode.code };
+    taskModel.value = { parentCode: parentCode.code, status: STATUS_NEW };
     taskCrudMode.value = "create";
     taskCrudDialog.value = true;
-}
-
-function createId() {
-    let id = "";
-    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (var i = 0; i < 5; i++) {
-        id += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return id;
 }
 
 // TreeTable
@@ -114,14 +105,6 @@ const refreshNode = async (node) => {
     }
 
     redrawTree();
-};
-
-const onPage = (event) => {
-
-    //imitate delay of a backend call
-    setTimeout(() => {
-        loadNodes(event.first, rows.value);
-    }, 1000);
 };
 
 const loadNodes = (first, rows) => {
