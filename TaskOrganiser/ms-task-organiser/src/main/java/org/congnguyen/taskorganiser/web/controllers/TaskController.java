@@ -98,9 +98,15 @@ public class TaskController {
         }
     }
 
-    @DeleteMapping("/code/{code}/deps")
-    public ResponseEntity<?> removeTaskDependencies() {
-        throw new UnsupportedOperationException();
+    @DeleteMapping("/code/{code}/deps/{dependsOn}")
+    public ResponseEntity<?> removeTaskDependencies(@PathVariable("code") String code,
+                                                    @PathVariable("dependsOn") String dependsOn) {
+        if (taskService.removeDependencies(code, dependsOn)){
+            return ResponseEntity.ok().build();
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @GetMapping("/code/{code}")

@@ -70,6 +70,19 @@ const showMessage = (severity: string, messageText: string) => {
         messageText: messageText
     };
 };
+
+const removeDependency = (data) => {
+    console.log(data);
+    if (!(modelObj.value?.code && data.code)) {
+        showMessage("warn", "No data available.");
+        return;
+    }
+
+    taskService.removeDependency(modelObj.value?.code, data.code);
+};
+
+const addDependency = () => {
+};
 </script>
 
 <template>
@@ -112,7 +125,7 @@ const showMessage = (severity: string, messageText: string) => {
                     </div>
 
                 </div>
-                <br/>
+                <br />
                 <div class="flex justify-between">
                     <p class="font-bold">Predecessors</p>
                 </div>
@@ -128,6 +141,12 @@ const showMessage = (severity: string, messageText: string) => {
                         <Column field="code" header="Code"></Column>
                         <Column field="name" header="Name"></Column>
                         <Column field="status" header="Status"></Column>
+                        <Column :exportable="false" style="min-width: 12rem">
+                            <template #body="{ data }">
+                                <Button icon="pi pi-trash" outlined rounded severity="danger"
+                                        @click="removeDependency(data)" />
+                            </template>
+                        </Column>
                     </DataTable>
                 </div>
                 <div class="flex flex-col md:flex-row gap-4">

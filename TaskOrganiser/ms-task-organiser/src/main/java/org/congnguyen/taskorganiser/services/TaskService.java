@@ -68,4 +68,9 @@ public class TaskService {
 
         return taskRepository.save(task);
     }
+
+    public boolean removeDependencies(String code, String dependsOn) {
+        taskRepository.removeDependency(code, dependsOn);
+        return true;
+    }
 }
