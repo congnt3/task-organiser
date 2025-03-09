@@ -123,8 +123,7 @@ const showMessage = (severity: string, messageText: string) => {
                         dataKey="code"
                         :rowHover="true"
                         filterDisplay="menu">
-
-                        <template #empty> No dependency found.</template>
+                        <template #empty> Nothing found.</template>
                         <template #loading> Loading customers data. Please wait.</template>
                         <Column field="code" header="Code"></Column>
                         <Column field="name" header="Name"></Column>
