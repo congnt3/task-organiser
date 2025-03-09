@@ -87,6 +87,6 @@ export class TaskService {
         const response = await this.apiService.post<Task>(
             ADD_DEPENDENCIES_ENDPOINT
                 .replace("{{code}}", code), [dependsOn]);
-        return response;
+        return response.data || null;
     }
 }

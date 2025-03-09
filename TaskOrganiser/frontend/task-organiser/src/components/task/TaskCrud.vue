@@ -79,6 +79,8 @@ const removeDependency = async (data) => {
     }
 
     await taskService.removeDependency(modelObj.value?.code, data.code);
+    let taskResult = await taskService.getTask(modelObj.value.code);
+    modelObj.value = taskResult || undefined;
 };
 
 const startSearch = async () => {
@@ -93,8 +95,8 @@ const addToDependency = async (data: Task) => {
         return;
     }
 
-    await taskService.addDependencies(modelObj.value?.code, data.code);
-
+    let taskResult = await taskService.addDependencies(modelObj.value?.code, data.code);
+    modelObj.value = taskResult || undefined;
 };
 </script>
 
