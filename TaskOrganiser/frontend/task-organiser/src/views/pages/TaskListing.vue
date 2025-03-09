@@ -249,7 +249,7 @@ function tagValue(task) {
 
         <Dialog v-model:visible="taskCrudDialog" class="capitalize" :style="{ width: '900px' }"
                 v-bind:header="taskCrudMode.concat(' Task Details')" :modal="true">
-            <TaskCrud v-model="taskModel" v-bind:mode="taskCrudMode" />
+            <TaskCrud v-model="taskModel" v-model:mode="taskCrudMode" />
         </Dialog>
 
         <Dialog v-model:visible="deleteTaskDialog" :style="{ width: '450px' }" header="Confirm deletion" :modal="true">

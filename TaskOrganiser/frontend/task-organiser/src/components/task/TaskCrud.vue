@@ -7,16 +7,17 @@ import { STATUS_COMPLETED, STATUS_IN_PROGRESS, STATUS_NEW } from "@/config/task.
 const taskService = new TaskService();
 const message = ref({ visible: false, severity: "info", messageText: "" });
 
-interface Props {
-    mode: string;
-}
+// interface Props {
+//     mode: string;
+// }
 
-let props = withDefaults(defineProps<Props>(), {
-    "mode": "create"
-});
+// let props = withDefaults(defineProps<Props>(), {
+//     "mode": "create"
+// });
 
 // Define the props with defaults
 let modelObj = defineModel<Task>();
+let mode = defineModel("mode");
 let searchBoxModel = ref({ searchText: "", result: [] });
 const dropdownStates = ref([
     { name: STATUS_NEW, code: STATUS_NEW },
@@ -40,14 +41,15 @@ const onSaveClick = async () => {
             "deadline": modelObj.value.deadline
         };
 
-        if (props.mode === "create") {
+        if (mode.value === "create") {
             let updateResult = await taskService.createTask(reqBody);
             if (updateResult) {
-                modelObj.value = { parentCode: modelObj.value.parentCode };
+                modelObj.value = updateResult;
+                mode.value = "update";
                 console.log(`Creating child task for parent: ${reqBody.parentCode}`);
                 showMessage("success", "Task saved");
             } else throw new Error(`Failed to save record: "${modelObj.value.code || ""}"`);
-        } else if (props.mode === "update") {
+        } else if (mode.value === "update") {
             if (!modelObj.value.code) {
                 console.log("Updating task failed. Task code is empty");
                 return;
@@ -153,16 +155,17 @@ const addToDependency = async (data: Task) => {
 
                 </div>
                 <br />
-                <div class="flex justify-between">
+                <div class="flex justify-between" v-if="mode.toLowerCase() != 'create'">
                     <p class="font-bold">Predecessors</p>
                 </div>
-                <div class="flex flex-col gap-4" style="background-color: #dddddd">
+                <div class="flex flex-col gap-4" style="background-color: #dddddd"
+                     v-if="mode.toLowerCase() != 'create'">
                     <InputGroup>
-                        <InputText id="searchText" type="text" v-model="searchBoxModel.searchText" />
+                        <InputText id="searchText" type="text" placeholder="Task to add dependency on ..." v-model="searchBoxModel.searchText" />
                         <Button label="Search" @click="startSearch" />
                     </InputGroup>
                 </div>
-                <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-4" v-if="mode.toLowerCase() != 'create'">
                     <DataTable
                         :value="searchBoxModel.result"
                         v-if="searchBoxModel.result.length > 0"
@@ -183,8 +186,8 @@ const addToDependency = async (data: Task) => {
                         </Column>
                     </DataTable>
                 </div>
-                <br />
-                <div class="flex flex-col gap-4">
+                <br  v-if="searchBoxModel.result.length > 0"/>
+                <div class="flex flex-col gap-4" v-if="mode.toLowerCase() != 'create'">
                     <DataTable
                         :value="modelObj?.dependsOn"
                         :rows="10"
@@ -206,7 +209,7 @@ const addToDependency = async (data: Task) => {
                 </div>
                 <div class="flex flex-col md:flex-row gap-4">
                     <Button label="Save" icon="pi pi-check" @click="onSaveClick" />
-                    <Button label="Save As New" v-if="props.mode!='create'" icon="pi pi-check" @click="" />
+                    <Button label="Save As New" v-if="mode!='create'" icon="pi pi-check" @click="" />
                 </div>
             </div>
         </div>
