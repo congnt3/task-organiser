@@ -114,6 +114,11 @@ public class TaskController {
         }
     }
 
+    /**
+     * Return the Task node with only first level dependencies
+     * @param code
+     * @return
+     */
     @GetMapping("/code/{code}")
     public ResponseEntity<TaskModel> getTaskByCode(@PathVariable("code") String code) {
         try {

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
@@ -25,7 +26,13 @@ public abstract class TaskMapper {
     @Mapping(target = "dependsOn", source = "dependsOnTasks", qualifiedByName = "codesToTasks")
     public abstract Task createTaskRequestToTask(CreateTaskRequest request);
 
+    /**
+     * Return the mapped TaskModel object with only first level dependencies
+     * @param task
+     * @return
+     */
     @Mapping(target = "parentCode", source = "parent.code")
+    @Mapping(target = "dependsOn", source = "dependsOn", qualifiedByName = "mapDependsOn")
     public abstract TaskModel taskToTaskModel(Task task);
 
     @Named("codeToTask")
@@ -54,5 +61,20 @@ public abstract class TaskMapper {
         }
 
         return tasks;
+    }
+
+    @Mapping(target = "dependsOn", ignore = true)
+    public abstract Task copyTaskEntityWithoutDependencies(Task input);
+
+    @Named("mapDependsOn")
+    protected List<TaskModel> mapDependsOn(List<Task> input) {
+        if (input == null){
+            return null;
+        }
+
+        var result = input.stream()
+                .map(this::copyTaskEntityWithoutDependencies)
+                .map(this::taskToTaskModel).toList();
+        return result;
     }
 }
