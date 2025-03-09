@@ -155,8 +155,7 @@ function calculateCustomerTotal(name) {
             :loading="loading1"
             :filters="filters1"
             :globalFilterFields="['name', 'country.name', 'representative.name', 'balance', 'status']"
-            showGridlines
-        >
+            showGridlines>
             <template #header>
                 <div class="flex justify-between">
                     <Button type="button" icon="pi pi-filter-slash" label="Clear" outlined @click="clearFilter()" />

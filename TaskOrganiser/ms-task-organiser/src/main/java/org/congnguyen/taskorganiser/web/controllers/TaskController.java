@@ -1,5 +1,7 @@
 package org.congnguyen.taskorganiser.web.controllers;
 
+import jakarta.validation.constraints.NotNull;
+import jdk.jshell.spi.ExecutionControl;
 import org.congnguyen.taskorganiser.persistence.exceptions.DuplicatedRecordException;
 import org.congnguyen.taskorganiser.persistence.models.Task;
 import org.congnguyen.taskorganiser.persistence.repositories.TaskRepository;
@@ -82,10 +84,29 @@ public class TaskController {
         }
     }
 
+    @PostMapping("/code/{code}/deps")
+    public ResponseEntity<?> addTaskDependencies(@PathVariable("code") String code, @NotNull @RequestBody List<String> deps) {
+        try {
+            var task = taskService.addDependencies(code, deps);
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(taskMapperImpl.taskToTaskModel(task));
+        } catch (RecordNotFoundException e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/code/{code}/deps")
+    public ResponseEntity<?> removeTaskDependencies() {
+        throw new UnsupportedOperationException();
+    }
+
     @GetMapping("/code/{code}")
     public ResponseEntity<TaskModel> getTaskByCode(@PathVariable("code") String code) {
         try {
-            Task task = taskService.getTaskByCode(code);
+            Task task = taskService.getTaskByCode(code, true);
             return ResponseEntity.ok(taskMapperImpl.taskToTaskModel(task));
         } catch (RecordNotFoundException e) {
             return ResponseEntity.notFound().build();

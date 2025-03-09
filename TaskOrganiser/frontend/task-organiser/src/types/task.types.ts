@@ -5,6 +5,7 @@ export interface Task {
     description?: string;
     status?: string;
     deadline?: Date;
+    dependsOn?: string[]
     createdAt?: Date;
     updatedAt?: Date;
 }

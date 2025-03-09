@@ -202,7 +202,7 @@ function tagValue(task) {
                 </template>
             </Toolbar>
             <TreeTable :value="nodes" :lazy="true" :paginator="false" :rows="rows"
-                       @nodeExpand="onExpand" tableStyle="min-width: 50rem">
+                       @nodeExpand="onExpand" :row-hover="true" tableStyle="min-width: 50rem">
                 <Column field="code" header="Code" :expander="true">
                     <template #body="slotProps">
                         <a :href="'/pages/crud?root=' + slotProps.node.data.code">{{ slotProps.node.data.code }}</a>
@@ -247,7 +247,7 @@ function tagValue(task) {
             </TreeTable>
         </div>
 
-        <Dialog v-model:visible="taskCrudDialog" class="capitalize" :style="{ width: '450px' }"
+        <Dialog v-model:visible="taskCrudDialog" class="capitalize" :style="{ width: '900px' }"
                 v-bind:header="taskCrudMode.concat(' Task Details')" :modal="true">
             <TaskCrud v-model="taskModel" v-bind:mode="taskCrudMode" />
         </Dialog>

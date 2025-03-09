@@ -46,7 +46,7 @@ const onSaveClick = async () => {
                 modelObj.value = { parentCode: modelObj.value.parentCode };
                 console.log(`Creating child task for parent: ${reqBody.parentCode}`);
                 showMessage("success", "Task saved");
-            } else throw new Error(`Failed to save record: "${modelObj.value.code || ''}"`);
+            } else throw new Error(`Failed to save record: "${modelObj.value.code || ""}"`);
         } else if (props.mode === "update") {
             if (!modelObj.value.code) {
                 console.log("Updating task failed. Task code is empty");
@@ -56,7 +56,7 @@ const onSaveClick = async () => {
             let updateResult = await taskService.updateTask(modelObj.value.code, reqBody);
             if (updateResult) {
                 showMessage("success", "Task saved");
-            } else throw new Error(`Failed to save record: "${modelObj.value.code  || ''}"`);
+            } else throw new Error(`Failed to save record: "${modelObj.value.code || ""}"`);
         }
     } catch (ex) {
         showMessage("warn", `${ex}`);
@@ -112,11 +112,31 @@ const showMessage = (severity: string, messageText: string) => {
                     </div>
 
                 </div>
+                <br/>
+                <div class="flex justify-between">
+                    <p class="font-bold">Predecessors</p>
+                </div>
+                <div class="flex flex-col gap-4">
+                    <DataTable
+                        :value="modelObj?.dependsOn"
+                        :rows="10"
+                        dataKey="code"
+                        :rowHover="true"
+                        filterDisplay="menu">
+
+                        <template #empty> No dependency found.</template>
+                        <template #loading> Loading customers data. Please wait.</template>
+                        <Column field="code" header="Code"></Column>
+                        <Column field="name" header="Name"></Column>
+                        <Column field="status" header="Status"></Column>
+                    </DataTable>
+                </div>
                 <div class="flex flex-col md:flex-row gap-4">
                     <Button label="Save" icon="pi pi-check" @click="onSaveClick" />
                     <Button label="Save As New" v-if="props.mode!='create'" icon="pi pi-check" @click="" />
                 </div>
             </div>
         </div>
+
     </Fluid>
 </template>

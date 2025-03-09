@@ -20,7 +20,7 @@ public class TaskModel {
 
     private List<TaskModel> children;
 
-    private List<String> dependsOnTasks;
+    private List<TaskModel> dependsOn;
 
     private List<ExternalLink> externalLinks;
 }
