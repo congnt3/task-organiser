@@ -86,6 +86,11 @@ public class TaskController {
 
     @PostMapping("/code/{code}/deps")
     public ResponseEntity<?> addTaskDependencies(@PathVariable("code") String code, @NotNull @RequestBody List<String> deps) {
+        if (deps.contains(code)){
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Dependencies contains self reference.");
+        }
         try {
             var task = taskService.addDependencies(code, deps);
 

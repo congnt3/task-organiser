@@ -85,8 +85,14 @@ const removeDependency = async (data) => {
 
 const startSearch = async () => {
     let searchResult = await taskService.getTask(searchBoxModel.value.searchText);
+    searchBoxModel.value.result = [];
+
     if (searchResult) {
         searchBoxModel.value.result = [searchResult];
+        searchBoxModel.value.searchText = "";
+
+    } else {
+        showMessage("warn", "No search result found.");
     }
 };
 const addToDependency = async (data: Task) => {
@@ -96,7 +102,13 @@ const addToDependency = async (data: Task) => {
     }
 
     let taskResult = await taskService.addDependencies(modelObj.value?.code, data.code);
-    modelObj.value = taskResult || undefined;
+    if (taskResult) {
+        searchBoxModel.value.result = [];
+        modelObj.value = taskResult || undefined;
+
+    } else {
+        showMessage("warn", "Failed to add dependency.");
+    }
 };
 </script>
 
@@ -144,16 +156,16 @@ const addToDependency = async (data: Task) => {
                 <div class="flex justify-between">
                     <p class="font-bold">Predecessors</p>
                 </div>
-                <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-4" style="background-color: #dddddd">
                     <InputGroup>
                         <InputText id="searchText" type="text" v-model="searchBoxModel.searchText" />
                         <Button label="Search" @click="startSearch" />
                     </InputGroup>
                 </div>
                 <div class="flex flex-col gap-4">
-
                     <DataTable
                         :value="searchBoxModel.result"
+                        v-if="searchBoxModel.result.length > 0"
                         :rows="10"
                         dataKey="code">
                         <template #empty> Nothing here.</template>
@@ -163,12 +175,15 @@ const addToDependency = async (data: Task) => {
                         <Column :exportable="false" style="min-width: 12rem">
                             <template #body="{ data }">
                                 <Button icon="pi pi-arrow-right" outlined rounded severity="success"
+                                        :disabled="(modelObj?.dependsOn?.map(n => n.code).includes(data.code) || data.code == modelObj?.code)"
                                         @click="addToDependency(data)" label="Add">
                                 </Button>
+
                             </template>
                         </Column>
                     </DataTable>
                 </div>
+                <br />
                 <div class="flex flex-col gap-4">
                     <DataTable
                         :value="modelObj?.dependsOn"
