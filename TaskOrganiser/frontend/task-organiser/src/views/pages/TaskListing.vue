@@ -236,11 +236,11 @@ function tagValue(task) {
                     <template #body="slotProps">
                         <Button icon="pi pi-play" outlined rounded class="mr-2"
                                 @click="updateTaskStatus(slotProps.node, STATUS_IN_PROGRESS)"
-                                :disabled="!slotProps.node.data"
+                                :disabled="!slotProps.node.data || slotProps.node.data.status != STATUS_NEW"
                                 tooltip="Mark as In Progress" />
                         <Button icon="pi pi-check" outlined rounded class="mr-2"
                                 @click="updateTaskStatus(slotProps.node, STATUS_COMPLETED)"
-                                :disabled="!slotProps.node.data"
+                                :disabled="!slotProps.node.data || slotProps.node.data.status == STATUS_COMPLETED"
                                 tooltip="Mark as Completed" />
                     </template>
 
