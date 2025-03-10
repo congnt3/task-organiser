@@ -10,6 +10,10 @@
     },
     "dependencies": {
         "@primevue/themes": "^4.2.4",
+        "@vue-flow/background": "latest",
+        "@vue-flow/controls": "latest",
+        "@vue-flow/core": "latest",
+        "@vue-flow/minimap": "latest",
         "chart.js": "3.3.2",
         "primeicons": "^7.0.0",
         "primevue": "^4.2.4",
