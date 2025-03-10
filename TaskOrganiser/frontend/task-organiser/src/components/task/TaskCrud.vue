@@ -7,14 +7,6 @@ import { STATUS_COMPLETED, STATUS_IN_PROGRESS, STATUS_NEW } from "@/config/task.
 const taskService = new TaskService();
 const message = ref({ visible: false, severity: "info", messageText: "" });
 
-// interface Props {
-//     mode: string;
-// }
-
-// let props = withDefaults(defineProps<Props>(), {
-//     "mode": "create"
-// });
-
 // Define the props with defaults
 let modelObj = defineModel<Task>();
 let mode = defineModel("mode");
