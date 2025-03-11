@@ -9,7 +9,7 @@ import {
     RETRIEVE_TASKS_BY_PARENT_ENDPOINT,
     PATCH_TASK_STATUS_ENDPOINT,
     REMOVE_DEPENDENCY_ENDPOINT,
-    ADD_DEPENDENCIES_ENDPOINT
+    ADD_DEPENDENCIES_ENDPOINT, RETRIEVE_TASKS_GRAPH_BY_PARENT_ENDPOINT
 } from "../config/api.config";
 
 export class TaskService {
@@ -45,6 +45,15 @@ export class TaskService {
      */
     public async getAllTasks(parentCode: string): Promise<Task[]> {
         const response = await this.apiService.get<Task[]>(RETRIEVE_TASKS_BY_PARENT_ENDPOINT.replace("{{code}}", parentCode));
+        return response.data || [];
+    }
+
+    /**
+     * Retrieve all tasks
+     * @returns Promise with array of tasks
+     */
+    public async getAllTasksAsGraph(parentCode: string): Promise<{}> {
+        const response = await this.apiService.get<Task[]>(RETRIEVE_TASKS_GRAPH_BY_PARENT_ENDPOINT.replace("{{code}}", parentCode));
         return response.data || [];
     }
 
@@ -89,4 +98,6 @@ export class TaskService {
                 .replace("{{code}}", code), [dependsOn]);
         return response.data || null;
     }
+
+
 }

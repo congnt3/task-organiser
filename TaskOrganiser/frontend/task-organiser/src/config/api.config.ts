@@ -5,5 +5,6 @@ export const UPDATE_TASK_ENDPOINT = "/api/tasks/code/{{code}}";
 export const PATCH_TASK_STATUS_ENDPOINT = "/api/tasks/code/{{code}}/status";
 export const DELETE_TASK_ENDPOINT = "/api/tasks/code/{{code}}";
 export const RETRIEVE_TASKS_BY_PARENT_ENDPOINT = "/api/tasks/parent/{{code}}";
+export const RETRIEVE_TASKS_GRAPH_BY_PARENT_ENDPOINT = "/api/tasks/parent/{{code}}/graph";
 export const REMOVE_DEPENDENCY_ENDPOINT = "/api/tasks/code/{{code}}/deps/{{dependsOn}}";
 export const ADD_DEPENDENCIES_ENDPOINT = "/api/tasks/code/{{code}}/deps";

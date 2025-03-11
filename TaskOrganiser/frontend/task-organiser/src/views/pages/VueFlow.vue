@@ -11,27 +11,38 @@ import "@vue-flow/core/dist/style.css";
 
 /* this contains the default theme, these are optional styles */
 import "@vue-flow/core/dist/theme-default.css";
+import { TaskService } from "@/service/TaskService.ts";
+
 
 const { onConnect, addEdges } = useVueFlow();
+const taskService = new TaskService();
 
 const nodes = ref<Node[]>([
     { id: "1", type: "input", label: "Node 1", position: { x: 250, y: 5 } },
     { id: "2", type: "output", label: "Node 2", position: { x: 100, y: 100 } },
     { id: "3", type: "custom", label: "Node 3", position: { x: 400, y: 100 } }
 ]);
-
+// const nodes = ref<Node[]>([]);
 const edges = ref<Edge[]>([
     { id: "e1-2", source: "1", target: "2", type: "custom" },
     { id: "e1-3", source: "1", target: "3", animated: true }
 ]);
 
+taskService.getAllTasksAsGraph("US123456")
+    .then(graph => {
+        nodes.value = graph.nodes;
+        edges.value = graph.edges;
+    });
+// const edges = ref<Edge[]>([]);
 onConnect((params) => {
     addEdges([params]);
+
+
 });
 </script>
 
 <template>
-        <div class="flex items-center justify-center min-h-screen overflow-hidden"  style="height: 100vh">
+    <div class="flex items-center justify-center min-h-screen overflow-hidden" style="height: 100vh">
 
         <VueFlow
             v-model:nodes="nodes"
@@ -41,7 +52,7 @@ onConnect((params) => {
             :default-zoom="0.2"
             :min-zoom="0.2"
             :max-zoom="4">
-            <Background pattern-color="#aaa" :gap="8"  />
+            <Background pattern-color="#aaa" :gap="8" />
 
             <MiniMap />
 
@@ -54,10 +65,11 @@ onConnect((params) => {
             <template #edge-custom="edgeProps">
                 <CustomEdge v-bind="edgeProps" />
             </template>
-        </VueFlow></div>
+        </VueFlow>
+    </div>
 </template>
 <style>
-.layout-main{
+.layout-main {
     width: 2100px;
 }
 </style>
