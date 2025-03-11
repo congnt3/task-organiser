@@ -6,10 +6,14 @@ import org.congnguyen.taskorganiser.persistence.repositories.TaskRepository;
 import org.congnguyen.taskorganiser.persistence.exceptions.RecordNotFoundException;
 import org.congnguyen.taskorganiser.web.models.CreateTaskRequest;
 import org.congnguyen.taskorganiser.web.models.TaskModel;
+import org.congnguyen.taskorganiser.web.models.graph.Edge;
+import org.congnguyen.taskorganiser.web.models.graph.Graph;
+import org.congnguyen.taskorganiser.web.models.graph.Node;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,12 +32,56 @@ public abstract class TaskMapper {
 
     /**
      * Return the mapped TaskModel object with only first level dependencies
+     *
      * @param task
      * @return
      */
     @Mapping(target = "parentCode", source = "parent.code")
     @Mapping(target = "dependsOn", source = "dependsOn", qualifiedByName = "mapDependsOn")
     public abstract TaskModel taskToTaskModel(Task task);
+
+    /**
+     * Return the mapped TaskModel object without dependencies
+     *
+     * @param task
+     * @return
+     */
+    @Named("TaskToTaskModelNoDeps")
+    @Mapping(target = "parentCode", source = "parent.code")
+    @Mapping(target = "dependsOn", ignore = true)
+    public abstract TaskModel taskToTaskModelNoDeps(Task task);
+
+    public Graph<TaskModel> tasksToTaskDepsGraph(List<Task> tasks, Graph<TaskModel> wipGraph) {
+        //Map list of tasks to Graph object with list of Node<TaskModel> and edges
+        Graph<TaskModel> graph = wipGraph == null ? new Graph<TaskModel>() : wipGraph;
+
+        tasks.forEach(t -> {
+            if (graph.getNodes().stream().map(n -> n.getData().getCode()).noneMatch(t.getCode()::equalsIgnoreCase)) {
+                graph.getNodes().add(this.taskToTaskModelGraphNode(t));
+
+                var dependencies = t.getDependsOn();
+                if (dependencies != null) {
+                    //Add all dependencies
+                    this.tasksToTaskDepsGraph(dependencies, graph);
+                    //Add all edges
+                    dependencies.forEach(d -> {
+                        var edge = new Edge();
+                        edge.setId(String.format("%s-%s", t.getCode(), d.getCode()));
+                        edge.setSource(t.getCode());
+                        edge.setTarget(d.getCode());
+                        graph.getEdges().add(edge);
+                    });
+                }
+            }
+        });
+
+        return graph;
+    }
+
+    @Mapping(target = "data", source = ".", qualifiedByName = "TaskToTaskModelNoDeps")
+    @Mapping(target = "id", source = "code")
+    @Mapping(target = "label", source = "code")
+    public abstract Node<TaskModel> taskToTaskModelGraphNode(Task task);
 
     @Named("codeToTask")
     protected Task stringToTask(String code) throws RecordNotFoundException {
@@ -68,7 +116,7 @@ public abstract class TaskMapper {
 
     @Named("mapDependsOn")
     protected List<TaskModel> mapDependsOn(List<Task> input) {
-        if (input == null){
+        if (input == null) {
             return null;
         }
 

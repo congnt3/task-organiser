@@ -11,6 +11,7 @@ import org.congnguyen.taskorganiser.web.mappers.TaskMapperImpl;
 import org.congnguyen.taskorganiser.web.models.CreateTaskRequest;
 import org.congnguyen.taskorganiser.web.models.ErrorResponse;
 import org.congnguyen.taskorganiser.web.models.TaskModel;
+import org.congnguyen.taskorganiser.web.models.graph.Graph;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -86,7 +87,7 @@ public class TaskController {
 
     @PostMapping("/code/{code}/deps")
     public ResponseEntity<?> addTaskDependencies(@PathVariable("code") String code, @NotNull @RequestBody List<String> deps) {
-        if (deps.contains(code)){
+        if (deps.contains(code)) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Dependencies contains self reference.");
@@ -106,16 +107,16 @@ public class TaskController {
     @DeleteMapping("/code/{code}/deps/{dependsOn}")
     public ResponseEntity<?> removeTaskDependencies(@PathVariable("code") String code,
                                                     @PathVariable("dependsOn") String dependsOn) {
-        if (taskService.removeDependencies(code, dependsOn)){
+        if (taskService.removeDependencies(code, dependsOn)) {
             return ResponseEntity.ok().build();
-        }
-        else {
+        } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
     /**
      * Return the Task node with only first level dependencies
+     *
      * @param code
      * @return
      */
@@ -167,5 +168,24 @@ public class TaskController {
         return ResponseEntity.ok(
                 taskRepository.findTopLevelTasks().stream()
                         .map(taskMapperImpl::taskToTaskModel).toList());
+    }
+
+    @GetMapping("/parent/{parent_code}/graph")
+    public ResponseEntity<Graph<TaskModel>> getTaskDepsGraph(@PathVariable("parent_code") String code) {
+        List<Task> result = null;
+        if ("root".equalsIgnoreCase(code)) {
+            result = taskRepository.findTopLevelTasks();
+        } else {
+            var task = taskService.findTaskByCode(code);
+            if (task.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            result = taskRepository.findChildrenByTaskCode(task.get().getCode());
+            result.forEach(r -> r.setDependsOn(taskRepository.findDependenciesByTaskCode(r.getCode())));
+        }
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(taskMapperImpl.tasksToTaskDepsGraph(result, null));
     }
 }
