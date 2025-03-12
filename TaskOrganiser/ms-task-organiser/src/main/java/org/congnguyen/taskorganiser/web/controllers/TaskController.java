@@ -2,6 +2,7 @@ package org.congnguyen.taskorganiser.web.controllers;
 
 import jakarta.validation.constraints.NotNull;
 import jdk.jshell.spi.ExecutionControl;
+import lombok.RequiredArgsConstructor;
 import org.congnguyen.taskorganiser.persistence.exceptions.DuplicatedRecordException;
 import org.congnguyen.taskorganiser.persistence.models.Task;
 import org.congnguyen.taskorganiser.persistence.repositories.TaskRepository;
@@ -12,6 +13,7 @@ import org.congnguyen.taskorganiser.web.models.CreateTaskRequest;
 import org.congnguyen.taskorganiser.web.models.ErrorResponse;
 import org.congnguyen.taskorganiser.web.models.TaskModel;
 import org.congnguyen.taskorganiser.web.models.graph.Graph;
+import org.congnguyen.taskorganiser.web.services.TaskGraphOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,17 +25,12 @@ import java.util.List;
 @CrossOrigin
 @RestController
 @RequestMapping("/api/tasks")
+@RequiredArgsConstructor
 public class TaskController {
     private final TaskService taskService;
     private final TaskMapperImpl taskMapperImpl;
     private final TaskRepository taskRepository;
-
-    @Autowired
-    public TaskController(TaskService taskService, TaskMapperImpl taskMapperImpl, TaskRepository taskRepository) {
-        this.taskService = taskService;
-        this.taskMapperImpl = taskMapperImpl;
-        this.taskRepository = taskRepository;
-    }
+    private final TaskGraphOrderService taskGraphOrderService;
 
     @PostMapping
     public ResponseEntity<?> createTask(@Validated @RequestBody CreateTaskRequest request) {
@@ -184,8 +181,12 @@ public class TaskController {
             result = taskRepository.findChildrenByTaskCode(task.get().getCode());
             result.forEach(r -> r.setDependsOn(taskRepository.findDependenciesByTaskCode(r.getCode())));
         }
+        var graph = taskMapperImpl.tasksToTaskDepsGraph(result);
+        this.taskGraphOrderService.markDepLevel(graph);
+        this.taskGraphOrderService.markOrder(graph);
+
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(taskMapperImpl.tasksToTaskDepsGraph(result, null));
+                .body(graph);
     }
 }

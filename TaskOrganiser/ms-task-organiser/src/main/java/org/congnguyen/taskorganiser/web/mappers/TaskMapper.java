@@ -51,18 +51,28 @@ public abstract class TaskMapper {
     @Mapping(target = "dependsOn", ignore = true)
     public abstract TaskModel taskToTaskModelNoDeps(Task task);
 
-    public Graph<TaskModel> tasksToTaskDepsGraph(List<Task> tasks, Graph<TaskModel> wipGraph) {
+    public Graph<TaskModel> tasksToTaskDepsGraph(List<Task> tasks) {
+        Graph<TaskModel> graph = new Graph<>();
+        tasksToTaskDepsGraph(tasks, graph);
+
+        return graph;
+    }
+
+    public List<Node<TaskModel>> tasksToTaskDepsGraph(List<Task> tasks, Graph<TaskModel> wipGraph) {
+        var result = new ArrayList<Node<TaskModel>>();
         //Map list of tasks to Graph object with list of Node<TaskModel> and edges
-        Graph<TaskModel> graph = wipGraph == null ? new Graph<TaskModel>() : wipGraph;
+        Graph<TaskModel> graph = wipGraph == null ? new Graph<>() : wipGraph;
 
         tasks.forEach(t -> {
             if (graph.getNodes().stream().map(n -> n.getData().getCode()).noneMatch(t.getCode()::equalsIgnoreCase)) {
-                graph.getNodes().add(this.taskToTaskModelGraphNode(t));
+                var nodeT = this.taskToTaskModelGraphNode(t);
 
                 var dependencies = t.getDependsOn();
+                List<Node<TaskModel>> convertedNodes = new ArrayList<>();
                 if (dependencies != null) {
                     //Add all dependencies
-                    this.tasksToTaskDepsGraph(dependencies, graph);
+                    convertedNodes.addAll(this.tasksToTaskDepsGraph(dependencies, graph));
+                    nodeT.setLinked(convertedNodes);
                     //Add all edges
                     dependencies.forEach(d -> {
                         var edge = new Edge();
@@ -72,10 +82,13 @@ public abstract class TaskMapper {
                         graph.getEdges().add(edge);
                     });
                 }
+
+                graph.getNodes().add(nodeT);
+                result.add(nodeT);
             }
         });
 
-        return graph;
+        return result;
     }
 
     @Mapping(target = "data", source = ".", qualifiedByName = "TaskToTaskModelNoDeps")
