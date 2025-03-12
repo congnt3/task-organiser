@@ -70,6 +70,8 @@ public class TaskGraphOrderService implements GraphOrderService<TaskModel> {
             displayMap.get(i).forEach(n -> this.markOrder(n, displayMap));
             displayMap.get(i).sort(Comparator.comparingInt(Node::getLevelIndex));
         }
+
+
         return obj;
     }
 
@@ -81,9 +83,9 @@ public class TaskGraphOrderService implements GraphOrderService<TaskModel> {
 
         if (node.getDepLevel() == 0) {
             node.setLevelIndex(displayMap.get(node.getDepLevel()).indexOf(node) * MAX_CHILD_COUNT);
+            setPosition(node, displayMap);
             return;
         }
-
         Integer depsMaxLevel = node.getLinked().stream()
                 .map(Node::getDepLevel)
                 .max(Comparator.comparingInt(n -> n))
@@ -93,5 +95,20 @@ public class TaskGraphOrderService implements GraphOrderService<TaskModel> {
         relatedSuperNode.setDependantCount(relatedSuperNode.getDependantCount() + 1);
         node.setLevelIndex(relatedSuperNode.getDependantCount() +
                 MAX_CHILD_COUNT * displayMap.get(relatedSuperNode.getDepLevel()).indexOf(relatedSuperNode));
+        setPosition(node, displayMap);
+
+    }
+
+    private void setPosition(Node<TaskModel> node,
+                             ArrayList<ArrayList<Node<TaskModel>>> displayMap) {
+
+        if (node == null) {
+            return;
+        }
+
+        var x = displayMap.get(node.getDepLevel()).indexOf(node) * 200;
+        var y = (node.getDepLevel() + 1) * -300;
+        node.getPosition().setX(x);
+        node.getPosition().setY(y);
     }
 }
