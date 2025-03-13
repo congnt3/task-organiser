@@ -73,9 +73,7 @@ public abstract class TaskMapper {
                 if (dependencies != null) {
                     //Add all dependencies
                     convertedNodes.addAll(this.tasksToTaskDepsGraph(dependencies, graph));
-                    if (nodeT.getLabel() == "US12345715"){
-                        System.out.println("US12345715");
-                    }
+
                     nodeT.setLinked(convertedNodes);
                     //Add all edges
                     dependencies.forEach(d -> {
@@ -89,8 +87,7 @@ public abstract class TaskMapper {
 
                 graph.getNodes().add(nodeT);
                 result.add(nodeT);
-            }
-            else { // if the node already exist in the graph
+            } else { // if the node already exist in the graph
                 result.add(existingNode.get());
             }
         });
