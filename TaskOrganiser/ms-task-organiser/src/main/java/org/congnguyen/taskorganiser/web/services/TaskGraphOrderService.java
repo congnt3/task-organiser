@@ -107,7 +107,7 @@ public class TaskGraphOrderService implements GraphOrderService<TaskModel> {
         }
 
         var x = displayMap.get(node.getDepLevel()).indexOf(node) * 200;
-        var y = (node.getDepLevel() + 1) * -300;
+        var y = (node.getDepLevel() + 1) * -200;
         node.getPosition().setX(x);
         node.getPosition().setY(y);
     }
