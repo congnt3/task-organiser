@@ -171,7 +171,7 @@ public class TaskController {
     public ResponseEntity<Graph<TaskModel>> getTaskDepsGraph(@PathVariable("parent_code") String code) {
         List<Task> result = null;
         if ("root".equalsIgnoreCase(code)) {
-            result = taskRepository.findTopLevelTasks();
+            result = taskRepository.findAll();
         } else {
             var task = taskService.findTaskByCode(code);
             if (task.isEmpty()) {

@@ -21,7 +21,7 @@ const nodes = ref<Node[]>([]);
 // const nodes = ref<Node[]>([]);
 const edges = ref<Edge[]>([]);
 
-taskService.getAllTasksAsGraph("US123456")
+taskService.getAllTasksAsGraph("root")
     .then(graph => {
         nodes.value = graph.nodes;
         edges.value = graph.edges;
