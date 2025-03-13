@@ -16,6 +16,9 @@ public interface TaskRepository extends Neo4jRepository<Task, String> {
     @Query("MATCH (p:Task)<-[:memberOf]-(c:Task) WHERE p.code = $code RETURN c")
     List<Task> findChildrenByTaskCode(@Param("code") String code);
 
+    @Query("MATCH (p:Task)<-[:memberOf*1..]-(c:Task) WHERE p.code = $code RETURN c")
+    List<Task> findByRootTask(@Param("code") String code);
+
     @Query("MATCH (t:Task)-[:dependsOn]->(d:Task) WHERE t.code = $code RETURN d")
     List<Task> findDependenciesByTaskCode(@Param("code") String code);
 

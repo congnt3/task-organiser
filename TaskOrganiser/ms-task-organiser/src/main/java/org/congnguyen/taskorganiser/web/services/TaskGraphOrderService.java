@@ -25,7 +25,10 @@ public class TaskGraphOrderService implements GraphOrderService<TaskModel> {
     }
 
     private void markDepLevel(Node<TaskModel> node) {
-        if (node == null | node.getDepLevel() >= 0) {
+        if (node.getData().getCode() == "US12345715"){
+            System.out.println("debug");
+        }
+        if (node == null || node.getDepLevel() >= 0) {
             return;
         }
 

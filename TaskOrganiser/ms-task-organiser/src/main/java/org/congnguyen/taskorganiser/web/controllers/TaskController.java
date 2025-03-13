@@ -178,7 +178,7 @@ public class TaskController {
                 return ResponseEntity.notFound().build();
             }
 
-            result = taskRepository.findChildrenByTaskCode(task.get().getCode());
+            result = taskRepository.findByRootTask(task.get().getCode());
             result.forEach(r -> r.setDependsOn(taskRepository.findDependenciesByTaskCode(r.getCode())));
         }
         var graph = taskMapperImpl.tasksToTaskDepsGraph(result);

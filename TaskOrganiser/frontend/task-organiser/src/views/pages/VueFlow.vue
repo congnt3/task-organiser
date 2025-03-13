@@ -17,16 +17,9 @@ import { TaskService } from "@/service/TaskService.ts";
 const { onConnect, addEdges } = useVueFlow();
 const taskService = new TaskService();
 
-const nodes = ref<Node[]>([
-    { id: "1", type: "input", label: "Node 1", position: { x: 250, y: 5 } },
-    { id: "2", type: "output", label: "Node 2", position: { x: 100, y: 100 } },
-    { id: "3", type: "custom", label: "Node 3", position: { x: 400, y: 100 } }
-]);
+const nodes = ref<Node[]>([]);
 // const nodes = ref<Node[]>([]);
-const edges = ref<Edge[]>([
-    { id: "e1-2", source: "1", target: "2", type: "custom" },
-    { id: "e1-3", source: "1", target: "3", animated: true }
-]);
+const edges = ref<Edge[]>([]);
 
 taskService.getAllTasksAsGraph("US123456")
     .then(graph => {

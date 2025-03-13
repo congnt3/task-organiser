@@ -64,7 +64,8 @@ public abstract class TaskMapper {
         Graph<TaskModel> graph = wipGraph == null ? new Graph<>() : wipGraph;
 
         tasks.forEach(t -> {
-            if (graph.getNodes().stream().map(n -> n.getData().getCode()).noneMatch(t.getCode()::equalsIgnoreCase)) {
+            var existingNode = graph.getNodes().stream().filter(node -> t.getCode().equalsIgnoreCase(node.getData().getCode())).findFirst();
+            if (existingNode.isEmpty()) {
                 var nodeT = this.taskToTaskModelGraphNode(t);
 
                 var dependencies = t.getDependsOn();
@@ -72,6 +73,9 @@ public abstract class TaskMapper {
                 if (dependencies != null) {
                     //Add all dependencies
                     convertedNodes.addAll(this.tasksToTaskDepsGraph(dependencies, graph));
+                    if (nodeT.getLabel() == "US12345715"){
+                        System.out.println("US12345715");
+                    }
                     nodeT.setLinked(convertedNodes);
                     //Add all edges
                     dependencies.forEach(d -> {
@@ -85,6 +89,9 @@ public abstract class TaskMapper {
 
                 graph.getNodes().add(nodeT);
                 result.add(nodeT);
+            }
+            else { // if the node already exist in the graph
+                result.add(existingNode.get());
             }
         });
 
