@@ -29,8 +29,6 @@ taskService.getAllTasksAsGraph("root")
 // const edges = ref<Edge[]>([]);
 onConnect((params) => {
     addEdges([params]);
-
-
 });
 </script>
 

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Random;
 
 @Service
 public class TaskGraphOrderService implements GraphOrderService<TaskModel> {
@@ -106,7 +107,11 @@ public class TaskGraphOrderService implements GraphOrderService<TaskModel> {
             return;
         }
 
-        var x = displayMap.get(node.getDepLevel()).indexOf(node) * 200;
+//        var x = displayMap.get(node.getDepLevel()).indexOf(node) * 200 + node.getDepLevel() % 2 * 100;
+        var nodeIndex = displayMap.get(node.getDepLevel()).indexOf(node);
+        int x = nodeIndex == 0 ?
+                (new Random().nextInt(200)) :
+                (displayMap.get(node.getDepLevel()).get(nodeIndex - 1).getPosition().getX() + 200);
         var y = (node.getDepLevel() + 1) * -200;
         node.getPosition().setX(x);
         node.getPosition().setY(y);
