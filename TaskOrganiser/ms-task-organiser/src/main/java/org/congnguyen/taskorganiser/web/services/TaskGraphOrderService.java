@@ -12,6 +12,7 @@ import java.util.Random;
 @Service
 public class TaskGraphOrderService implements GraphOrderService<TaskModel> {
     private static final int MAX_CHILD_COUNT = 100;
+    Random random = new Random();
 
     @Override
     public Graph markDepLevel(Graph<TaskModel> obj) {
@@ -52,7 +53,7 @@ public class TaskGraphOrderService implements GraphOrderService<TaskModel> {
         }
 
         // find max depLevel
-        var maxDepLvl = obj.getNodes().stream()
+        int maxDepLvl = obj.getNodes().stream()
                 .map(Node::getDepLevel)
                 .max(Comparator.comparingInt(n -> n))
                 .orElse(0);
@@ -62,16 +63,12 @@ public class TaskGraphOrderService implements GraphOrderService<TaskModel> {
             displayMap.add(new ArrayList<>());
         }
 
-//        obj.getNodes().forEach(n -> this.markOrder(n, firstLvlCounter));
-        obj.getNodes().forEach(n -> {
-            displayMap.get(n.getDepLevel()).add(n);
-        });
+        obj.getNodes().forEach(n -> displayMap.get(n.getDepLevel()).add(n));
 
         for (int i = 0; i <= maxDepLvl; i++) {
             displayMap.get(i).forEach(n -> this.markOrder(n, displayMap));
             displayMap.get(i).sort(Comparator.comparingInt(Node::getLevelIndex));
         }
-
 
         return obj;
     }
@@ -83,10 +80,11 @@ public class TaskGraphOrderService implements GraphOrderService<TaskModel> {
         }
 
         if (node.getDepLevel() == 0) {
-            node.setLevelIndex(displayMap.get(node.getDepLevel()).indexOf(node) * MAX_CHILD_COUNT);
+            node.setLevelIndex(displayMap.get(0).indexOf(node) * MAX_CHILD_COUNT);
             setPosition(node, displayMap);
             return;
         }
+
         Integer depsMaxLevel = node.getLinked().stream()
                 .map(Node::getDepLevel)
                 .max(Comparator.comparingInt(n -> n))
@@ -97,19 +95,17 @@ public class TaskGraphOrderService implements GraphOrderService<TaskModel> {
         node.setLevelIndex(relatedSuperNode.getDependantCount() +
                 MAX_CHILD_COUNT * displayMap.get(relatedSuperNode.getDepLevel()).indexOf(relatedSuperNode));
         setPosition(node, displayMap);
-
     }
 
     private void setPosition(Node<TaskModel> node,
                              ArrayList<ArrayList<Node<TaskModel>>> displayMap) {
-
         if (node == null) {
             return;
         }
 
         var nodeIndex = displayMap.get(node.getDepLevel()).indexOf(node);
         int x = nodeIndex == 0 ?
-                (new Random().nextInt(200)) :
+                (random.nextInt(200)) :
                 (displayMap.get(node.getDepLevel()).get(nodeIndex - 1).getPosition().getX() + 200);
         var y = (node.getDepLevel() + 1) * -200;
         node.getPosition().setX(x);
