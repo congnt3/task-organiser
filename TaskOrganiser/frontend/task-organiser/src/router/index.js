@@ -9,13 +9,13 @@ const router = createRouter({
             component: AppLayout,
             children: [
                 {
-                    path: '/',
+                    path: '/dashboard',
                     name: 'dashboard',
                     component: () => import('@/views/Dashboard.vue')
                 },
                 {
-                    path: '/pages/flow',
-                    name: 'flow',
+                    path: '/pages/deps',
+                    name: 'dep-structure',
                     component: () => import('@/views/pages/VueFlow.vue')
                 },
                 {
@@ -100,8 +100,8 @@ const router = createRouter({
                     component: () => import('@/views/pages/Empty.vue')
                 },
                 {
-                    path: '/pages/crud',
-                    name: 'crud',
+                    path: '/',
+                    name: 'task-listing',
                     component: () => import('@/views/pages/TaskListing.vue')
                 },
                 {
