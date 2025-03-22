@@ -30,6 +30,11 @@ taskService.getAllTasksAsGraph("root")
 onConnect((params) => {
     addEdges([params]);
 });
+
+// Node click event handler
+function onNodeClick({ event, node }) {
+    console.log('Node clicked:', node, event);
+}
 </script>
 
 <template>
@@ -41,7 +46,8 @@ onConnect((params) => {
             class="vue-flow-basic-example"
             :default-zoom="0.2"
             :min-zoom="0.2"
-            :max-zoom="4">
+            :max-zoom="4"
+            @node-click="onNodeClick">
             <Background pattern-color="#aaa" :gap="8" />
 
             <MiniMap />

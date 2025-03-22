@@ -1,7 +1,5 @@
 <script lang="ts" setup>
-import { Handle, Position } from "@vue-flow/core";
-import { ref } from "vue";
-import { Node } from "@vue-flow/core";
+import { Handle, Node, Position } from "@vue-flow/core";
 import { STATUS_COMPLETED, STATUS_IN_PROGRESS, STATUS_NEW } from "@/config/task.constants.ts";
 
 let node = defineProps<Node>();
