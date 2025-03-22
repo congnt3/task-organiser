@@ -1,22 +1,38 @@
 <script lang="ts" setup>
-import { Handle, Position } from '@vue-flow/core'
-import { ref } from 'vue'
+import { Handle, Position } from "@vue-flow/core";
+import { ref } from "vue";
+import { Node } from "@vue-flow/core";
 
-const counter = ref(0)
+let node = defineProps<Node>();
+const counter = ref(0);
 </script>
 
 <template>
-    <div class="custom-node">
-        <Handle type="target" :position="Position.Top" />
-        <button class="increment nodrag" @click="counter++">Increment</button>
-
-        <div v-if="counter > 0" class="counter">
-            <div class="count" v-for="count of counter" :key="`count-${count}`">aaa{{ count }}</div>
-        </div>
-    </div>
+    <Handle type="target" :position="Position.Top" />
+    <Handle type="source" :position="Position.Bottom" />
+    <Card style="width: 100%; overflow: hidden">
+        <template #header>
+            <p></p>
+        </template>
+        <template #title>{{ node.data.code }}</template>
+        <template #subtitle>{{ node.data.name }}</template>
+        <template #content>
+            {{ node.data.status }}
+        </template>
+        <template #footer></template>
+    </Card>
 </template>
 
 <style>
+.vue-flow__node {
+    border: none !important;
+    background-color: transparent !important;
+}
+.vue-flow__node-default {
+    border: none !important;
+    background-color: transparent;
+}
+
 .custom-node {
     min-width: 100px;
     gap: 4px;

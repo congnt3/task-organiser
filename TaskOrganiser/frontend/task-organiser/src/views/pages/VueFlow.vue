@@ -34,7 +34,6 @@ onConnect((params) => {
 
 <template>
     <div class="flex items-center justify-center min-h-screen overflow-hidden" style="height: 100vh">
-
         <VueFlow
             v-model:nodes="nodes"
             v-model:edges="edges"
@@ -49,7 +48,7 @@ onConnect((params) => {
 
             <Controls />
 
-            <template #node-custom="nodeProps">
+            <template #node-default="nodeProps">
                 <CustomNode v-bind="nodeProps" />
             </template>
 

@@ -8,7 +8,7 @@ const model = ref([
         label: "Home",
         items: [
             { label: "Manage Tasks", icon: "pi pi-fw pi-home", to: "/" },
-            { label: "Task Dependency Structure", icon: "pi pi-fw pi-home", to: "/pages/deps" }]
+            { label: "Dependency Structure", icon: "pi pi-fw pi-home", to: "/pages/deps" }]
     }
 ]);
 </script>
