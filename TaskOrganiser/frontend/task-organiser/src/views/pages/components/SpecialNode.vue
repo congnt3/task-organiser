@@ -2,9 +2,19 @@
 import { Handle, Position } from "@vue-flow/core";
 import { ref } from "vue";
 import { Node } from "@vue-flow/core";
+import { STATUS_COMPLETED, STATUS_IN_PROGRESS, STATUS_NEW } from "@/config/task.constants.ts";
 
 let node = defineProps<Node>();
-const counter = ref(0);
+function tagValue(task) {
+    switch (task.status) {
+        case STATUS_COMPLETED:
+            return "success";
+        case STATUS_IN_PROGRESS:
+            return "info";
+        case STATUS_NEW:
+            return "warn";
+    }
+}
 </script>
 
 <template>
@@ -17,7 +27,8 @@ const counter = ref(0);
         <template #title>{{ node.data.code }}</template>
         <template #subtitle>{{ node.data.name }}</template>
         <template #content>
-            {{ node.data.status }}
+            <Tag :severity="tagValue(node.data)"
+                 :value="node.data.status"></Tag>
         </template>
         <template #footer></template>
     </Card>
@@ -40,32 +51,5 @@ const counter = ref(0);
     background: white;
     border: 1px solid black;
     border-radius: 4px;
-}
-
-.increment {
-    border-radius: 4px;
-    background: #42b983;
-    font-size: 10px;
-    color: #fff;
-    cursor: pointer;
-    border: none;
-}
-
-.increment:hover {
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-}
-
-.counter {
-    margin-top: 8px;
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 4px;
-}
-
-.count {
-    font-size: 6px;
-    color: #ff0072;
-    border: 1px solid rgba(0, 0, 0, 0.3);
-    border-radius: 8px;
 }
 </style>
