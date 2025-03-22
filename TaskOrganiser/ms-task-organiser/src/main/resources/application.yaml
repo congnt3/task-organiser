@@ -6,8 +6,8 @@ spring:
     security:
       encrypted: false
     authentication:
-      username: ms-task-organiser
-      password: ms-task-organiser
+      username: neo4j
+      password: pass@word1
   data:
     neo4j:
       database: neo4j
