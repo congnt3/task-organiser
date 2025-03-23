@@ -1,11 +1,24 @@
 services:
   neo4j:
-    image: 'neo4j:latest'
+    image: neo4j:latest
+    volumes:
+      - /$HOME/neo4j/logs:/logs
+      - /$HOME/neo4j/config:/config
+      - /$HOME/neo4j/data:/data
+      - /$HOME/neo4j/plugin:/plugins
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    restart: always
+    # Passes the following environment variables to the container
     environment:
-      - 'NEO4J_AUTH=neo4j/notverysecret'
-    ports:
-      - '7687'
-  redis:
-    image: 'redis:latest'
-    ports:
-      - '6379'
+      - NEO4J_ACCEPT_LICENSE_AGREEMENT
+
+    # Simple check testing whether the port 7474 is opened.
+    # If so, the instance running inside the container is considered as "healthy".
+    # This status can be checked using the "docker ps" command.
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider localhost:7474 || exit 1" ]
+
+    # Set up the user
+    user: 501:20
