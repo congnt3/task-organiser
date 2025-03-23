@@ -149,6 +149,36 @@ const addToDependency = async (data: Task) => {
                     </div>
 
                 </div>
+
+                <Fieldset legend="Planning">
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="flex flex-wrap gap-2 w-full">
+                            <label for="estimated">Estimated (days)</label>
+                            <div class="flex flex-col gap-1 w-full">
+                                <InputNumber v-model="modelObj.plannedStartDate" inputId="estimated" :min="0" :max="5" fluid />
+
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2 w-full">
+                            <label for="plannedStartDate">Start Date</label>
+                            <div class="flex flex-col gap-1 w-full">
+                                <DatePicker input-id="plannedStartDate" v-model="modelObj.plannedStartDate"
+                                            dateFormat="dd/mm/yy"
+                                            showIcon
+                                            fluid iconDisplay="input"/>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2 w-full">
+                            <label for="plannedCompletionDate">Completion Date</label>
+                            <div class="flex flex-col gap-1 w-full">
+                                <DatePicker input-id="plannedCompletionDate" v-model="modelObj.plannedCompletionDate"
+                                            dateFormat="dd/mm/yy" showIcon
+                                            fluid iconDisplay="input"/>
+                            </div>
+                        </div>
+                    </div>
+                </Fieldset>
                 <br/>
                 <div class="flex justify-between" v-if="mode.toLowerCase() != 'create'">
                     <p class="font-bold">Predecessors</p>
