@@ -107,7 +107,7 @@ public class TaskGraphOrderService implements GraphOrderService<TaskModel> {
         int x = nodeIndex == 0 ?
                 (random.nextInt(200)) :
                 (displayMap.get(node.getDepLevel()).get(nodeIndex - 1).getPosition().getX() + 200);
-        var y = (node.getDepLevel() + 1) * -200;
+        var y = (node.getDepLevel() + 1) * -300;
         node.getPosition().setX(x);
         node.getPosition().setY(y);
     }

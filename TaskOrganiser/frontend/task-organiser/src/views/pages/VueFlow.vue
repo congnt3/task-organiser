@@ -57,7 +57,7 @@ function onNodeClick({ event, node }) {
                 <CustomEdge v-bind="edgeProps" />
             </template>
         </VueFlow>
-        <Drawer v-model:visible="drawerModel.visible" header="Task Details" position="right">
+        <Drawer v-model:visible="drawerModel.visible" header="Task Details" position="right" class="!w-full md:!w-80 lg:!w-[30rem]">
             <div>
                 <DataView :value="Object.keys(drawerModel.data)">
                     <template #list="slotProps">
