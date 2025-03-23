@@ -2,7 +2,6 @@
 import { ref } from "vue";
 import { Background } from "@vue-flow/background";
 import { Controls } from "@vue-flow/controls";
-import { MiniMap } from "@vue-flow/minimap";
 import { VueFlow, useVueFlow, type Node, type Edge } from "@vue-flow/core";
 import CustomNode from "./components/SpecialNode.vue";
 import CustomEdge from "./components/SpecialEdge.vue";
@@ -20,7 +19,7 @@ const nodes = ref<Node[]>([]);
 // const nodes = ref<Node[]>([]);
 const edges = ref<Edge[]>([]);
 const drawerModel = ref({ visible: false, data: {} });
-
+const drawerExcludedKeys = ["children", "externalLinks"];
 taskService.getAllTasksAsGraph("root")
     .then(graph => {
         nodes.value = graph.nodes;
@@ -57,9 +56,10 @@ function onNodeClick({ event, node }) {
                 <CustomEdge v-bind="edgeProps" />
             </template>
         </VueFlow>
-        <Drawer v-model:visible="drawerModel.visible" header="Task Details" position="right" class="!w-full md:!w-80 lg:!w-[30rem]">
+        <Drawer v-model:visible="drawerModel.visible" header="Task Details" position="right"
+                class="!w-full md:!w-80 lg:!w-[30rem]">
             <div>
-                <DataView :value="Object.keys(drawerModel.data)">
+                <DataView :value="Object.keys(drawerModel.data).filter((k) => !drawerExcludedKeys.includes(k))">
                     <template #list="slotProps">
                         <div class="flex flex-col">
                             <div v-for="(item, index) in slotProps.items" :key="index">
