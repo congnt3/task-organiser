@@ -2,7 +2,7 @@ spring:
   application:
     name: ms-task-organiser
   neo4j:
-    uri: bolt://localhost:7689
+    uri: bolt://localhost:7687
     security:
       encrypted: false
     authentication:

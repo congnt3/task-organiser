@@ -2,7 +2,9 @@ package org.congnguyen.taskorganiser.web.models;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import org.springframework.data.neo4j.core.schema.Property;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -17,6 +19,14 @@ public class TaskModel {
     private String status;
 
     private String parentCode;
+
+    private LocalDateTime dueDate;
+
+    private int estimatedEffortDays;
+
+    private LocalDateTime plannedStartDate;
+
+    private LocalDateTime plannedCompletionDate;
 
     private List<TaskModel> children;
 

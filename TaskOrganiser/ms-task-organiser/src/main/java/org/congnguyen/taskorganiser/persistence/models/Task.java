@@ -12,6 +12,7 @@ import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Property;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Node("Task")
@@ -36,6 +37,18 @@ public class Task extends ModelBase  {
 
     @Relationship(value = "memberOf", direction = Relationship.Direction.OUTGOING, cascadeUpdates = false)
     private Task parent;
+
+    @Property("due_date")
+    private LocalDateTime dueDate;
+
+    @Property("estimated_effort_days")
+    private int estimatedEffortDays;
+
+    @Property("planned_start_date")
+    private LocalDateTime plannedStartDate;
+
+    @Property("planned_completion_date")
+    private LocalDateTime plannedCompletionDate;
 
     //Intended not to be loaded automatically
     private List<Task> children;

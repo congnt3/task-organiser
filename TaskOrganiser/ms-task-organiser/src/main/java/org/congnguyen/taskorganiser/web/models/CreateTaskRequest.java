@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.congnguyen.taskorganiser.domain.models.IExternalLink;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -20,6 +21,14 @@ public class CreateTaskRequest {
     private String status;
 
     private String parentCode;
+
+    private LocalDateTime dueDate;
+
+    private int estimatedEffortDays;
+
+    private LocalDateTime plannedStartDate;
+
+    private LocalDateTime plannedCompletionDate;
 
     private List<String> dependsOnTasks;
 
