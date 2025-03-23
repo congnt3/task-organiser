@@ -49,15 +49,10 @@ function onNodeClick({ event, node }) {
             :max-zoom="4"
             @node-click="onNodeClick">
             <Background pattern-color="#aaa" :gap="8" />
-
-            <MiniMap />
-
             <Controls />
-
             <template #node-default="nodeProps">
                 <CustomNode v-bind="nodeProps" />
             </template>
-
             <template #edge-custom="edgeProps">
                 <CustomEdge v-bind="edgeProps" />
             </template>
