@@ -20,5 +20,5 @@ services:
     healthcheck:
       test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider localhost:7474 || exit 1" ]
 
-    # Set up the user
+    # Set up the user: user-id:group-id. find out by "id -u" and "id -g" in terminal
     user: 501:20
