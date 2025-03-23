@@ -13,13 +13,13 @@ import "@vue-flow/core/dist/style.css";
 import "@vue-flow/core/dist/theme-default.css";
 import { TaskService } from "@/service/TaskService.ts";
 
-
 const { onConnect, addEdges } = useVueFlow();
 const taskService = new TaskService();
 
 const nodes = ref<Node[]>([]);
 // const nodes = ref<Node[]>([]);
 const edges = ref<Edge[]>([]);
+const drawerModel = ref({ visible: false, data: {} });
 
 taskService.getAllTasksAsGraph("root")
     .then(graph => {
@@ -33,7 +33,7 @@ onConnect((params) => {
 
 // Node click event handler
 function onNodeClick({ event, node }) {
-    console.log('Node clicked:', node, event);
+    drawerModel.value = { visible: true, data: node.data };
 }
 </script>
 
@@ -62,6 +62,27 @@ function onNodeClick({ event, node }) {
                 <CustomEdge v-bind="edgeProps" />
             </template>
         </VueFlow>
+        <Drawer v-model:visible="drawerModel.visible" header="Task Details" position="right">
+            <div>
+                <DataView :value="Object.keys(drawerModel.data)">
+                    <template #list="slotProps">
+                        <div class="flex flex-col">
+                            <div v-for="(item, index) in slotProps.items" :key="index">
+                                <div class="flex flex-col sm:flex-row sm:items-center p-6 gap-4"
+                                     :class="{ 'border-t border-surface-200 dark:border-surface-700': index !== 0 }">
+                                    <div>
+                                        <span
+                                            class="font-medium text-surface-500 dark:text-surface-400 text-sm capitalize"> {{ item
+                                            }}</span>
+                                        <div class="text-lg font-medium mt-2">{{ drawerModel.data[item] }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </DataView>
+            </div>
+        </Drawer>
     </div>
 </template>
 <style>
