@@ -1,4 +1,5 @@
 <script setup lang="ts">
+
 import { ref } from "vue";
 import { TaskService } from "@/service/TaskService.ts";
 import { Task } from "@/types/task.types.ts";
@@ -12,16 +13,16 @@ import {
 } from "@/config/task.constants.ts";
 
 const taskService = new TaskService();
-const message = ref({ visible: false, severity: "info", messageText: "" });
+const message = ref({visible: false, severity: "info", messageText: ""});
 
 // Define the props with defaults
 let modelObj = defineModel<Task>();
 let mode = defineModel("mode");
-let searchBoxModel = ref({ searchText: "", result: [] });
+let searchBoxModel = ref({searchText: "", result: []});
 const dropdownStates = ref([
-    { name: STATUS_NEW, code: STATUS_NEW },
-    { name: STATUS_IN_PROGRESS, code: STATUS_IN_PROGRESS },
-    { name: STATUS_COMPLETED, code: STATUS_COMPLETED }
+    {name: STATUS_NEW, code: STATUS_NEW},
+    {name: STATUS_IN_PROGRESS, code: STATUS_IN_PROGRESS},
+    {name: STATUS_COMPLETED, code: STATUS_COMPLETED}
 ]);
 const dropdownTypes = ref([
     { name: TYPE_BUSINESS_OUTCOME, code: "BO" },
@@ -43,7 +44,7 @@ const onSaveClick = async () => {
             "name": modelObj.value.name,
             "description": modelObj.value.description,
             "status": modelObj.value.status,
-            "deadline": modelObj.value.deadline
+            "dueDate": modelObj.value.dueDate
         };
 
         if (mode.value === "create") {
@@ -131,7 +132,7 @@ const onGenerateNewTaskId = () => {
                 <div class="flex flex-col md:flex-row gap-4">
                     <div class="flex flex-wrap gap-2 w-full">
                         <label for="parent">Parent</label>
-                        <InputText id="parent" type="text" v-model="modelObj.parentCode" />
+                        <InputText id="parent" type="text" v-model="modelObj.parentCode"/>
                     </div>
                     <div class="flex flex-wrap gap-2 w-2/12">
                         <label for="type">Type</label>
@@ -152,12 +153,12 @@ const onGenerateNewTaskId = () => {
                 <div class="flex flex-col md:flex-row gap-4">
                     <div class="flex flex-wrap gap-2 w-full">
                         <label for="name">Name</label>
-                        <InputText id="name" type="text" v-model="modelObj.name" />
+                        <InputText id="name" type="text" v-model="modelObj.name"/>
                     </div>
                 </div>
                 <div class="flex flex-wrap">
                     <label for="description">Description</label>
-                    <Textarea id="description" rows="4" v-model="modelObj.description" />
+                    <Textarea id="description" rows="4" v-model="modelObj.description"/>
                 </div>
                 <div class="flex flex-col md:flex-row gap-4">
                     <div class="flex flex-wrap gap-2 w-full">
@@ -169,20 +170,54 @@ const onGenerateNewTaskId = () => {
                     </div>
 
                     <div class="flex flex-wrap gap-2 w-full">
-                        <label for="deadline">Deadline</label>
-                        <InputText id="deadline" type="text" v-model="modelObj.deadline" />
+                        <label for="dueDate">Due Date</label>
+                        <div class="flex flex-col gap-1 w-full">
+                            <DatePicker input-id="dueDate" v-model="modelObj.dueDate" dateFormat="dd/mm/yy" showIcon
+                                        fluid iconDisplay="input"/>
+                        </div>
                     </div>
 
                 </div>
-                <br />
+
+                <Fieldset legend="Planning">
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="flex flex-wrap gap-2 w-full">
+                            <label for="estimated">Estimated (days)</label>
+                            <div class="flex flex-col gap-1 w-full">
+                                <InputNumber v-model="modelObj.plannedStartDate" inputId="estimated" :min="0" :max="5" fluid />
+
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2 w-full">
+                            <label for="plannedStartDate">Start Date</label>
+                            <div class="flex flex-col gap-1 w-full">
+                                <DatePicker input-id="plannedStartDate" v-model="modelObj.plannedStartDate"
+                                            dateFormat="dd/mm/yy"
+                                            showIcon
+                                            fluid iconDisplay="input"/>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2 w-full">
+                            <label for="plannedCompletionDate">Completion Date</label>
+                            <div class="flex flex-col gap-1 w-full">
+                                <DatePicker input-id="plannedCompletionDate" v-model="modelObj.plannedCompletionDate"
+                                            dateFormat="dd/mm/yy" showIcon
+                                            fluid iconDisplay="input"/>
+                            </div>
+                        </div>
+                    </div>
+                </Fieldset>
+                <br/>
                 <div class="flex justify-between" v-if="mode.toLowerCase() != 'create'">
                     <p class="font-bold">Predecessors</p>
                 </div>
                 <div class="flex flex-col gap-4" style="background-color: #dddddd"
                      v-if="mode.toLowerCase() != 'create'">
                     <InputGroup>
-                        <InputText id="searchText" type="text" placeholder="Task to add dependency on ..." v-model="searchBoxModel.searchText" />
-                        <Button label="Search" @click="startSearch" />
+                        <InputText id="searchText" type="text" placeholder="Task to add dependency on ..."
+                                   v-model="searchBoxModel.searchText"/>
+                        <Button label="Search" @click="startSearch"/>
                     </InputGroup>
                 </div>
                 <div class="flex flex-col gap-4" v-if="mode.toLowerCase() != 'create'">
@@ -206,7 +241,7 @@ const onGenerateNewTaskId = () => {
                         </Column>
                     </DataTable>
                 </div>
-                <br  v-if="searchBoxModel.result.length > 0"/>
+                <br v-if="searchBoxModel.result.length > 0"/>
                 <div class="flex flex-col gap-4" v-if="mode.toLowerCase() != 'create'">
                     <DataTable
                         :value="modelObj?.dependsOn"
@@ -222,14 +257,14 @@ const onGenerateNewTaskId = () => {
                         <Column :exportable="false" style="min-width: 12rem">
                             <template #body="{ data }">
                                 <Button icon="pi pi-trash" outlined rounded severity="danger"
-                                        @click="removeDependency(data)" />
+                                        @click="removeDependency(data)"/>
                             </template>
                         </Column>
                     </DataTable>
                 </div>
                 <div class="flex flex-col md:flex-row gap-4">
-                    <Button label="Save" icon="pi pi-check" @click="onSaveClick" />
-                    <Button label="Save As New" v-if="mode!='create'" icon="pi pi-check" @click="" />
+                    <Button label="Save" icon="pi pi-check" @click="onSaveClick"/>
+                    <Button label="Save As New" v-if="mode!='create'" icon="pi pi-check" @click=""/>
                 </div>
             </div>
         </div>

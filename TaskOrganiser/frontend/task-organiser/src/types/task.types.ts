@@ -5,7 +5,10 @@ export interface Task {
     name?: string;
     description?: string;
     status?: string;
-    deadline?: Date;
+    dueDate?: Date;
+    estimatedEffortDays?: number
+    plannedStartDate?: Date;
+    plannedCompletionDate?: Date;
     dependsOn?: Task[]
     createdAt?: Date;
     updatedAt?: Date;
