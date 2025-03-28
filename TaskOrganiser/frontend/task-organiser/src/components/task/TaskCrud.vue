@@ -2,7 +2,14 @@
 import { ref } from "vue";
 import { TaskService } from "@/service/TaskService.ts";
 import { Task } from "@/types/task.types.ts";
-import { STATUS_COMPLETED, STATUS_IN_PROGRESS, STATUS_NEW } from "@/config/task.constants.ts";
+import {
+    STATUS_COMPLETED,
+    STATUS_IN_PROGRESS,
+    STATUS_NEW,
+    TYPE_BUSINESS_OUTCOME, TYPE_EPIC, TYPE_FEATURE,
+    TYPE_TASK_BW,
+    TYPE_TASK_EW
+} from "@/config/task.constants.ts";
 
 const taskService = new TaskService();
 const message = ref({ visible: false, severity: "info", messageText: "" });
@@ -16,7 +23,13 @@ const dropdownStates = ref([
     { name: STATUS_IN_PROGRESS, code: STATUS_IN_PROGRESS },
     { name: STATUS_COMPLETED, code: STATUS_COMPLETED }
 ]);
-
+const dropdownTypes = ref([
+    { name: TYPE_BUSINESS_OUTCOME, code: "BO" },
+    { name: TYPE_EPIC, code: "E" },
+    { name: TYPE_FEATURE, code: "F" },
+    { name: TYPE_TASK_BW, code: "TS" },
+    { name: TYPE_TASK_EW, code: "ES" }
+]);
 const onSaveClick = async () => {
     try {
         if (!modelObj.value) {
@@ -104,6 +117,10 @@ const addToDependency = async (data: Task) => {
         showMessage("warn", "Failed to add dependency.");
     }
 };
+
+const onGenerateNewTaskId = () => {
+    modelObj.value.code = (modelObj.value?.type ?? "TS") + Date.now();
+};
 </script>
 
 <template>
@@ -116,9 +133,20 @@ const addToDependency = async (data: Task) => {
                         <label for="parent">Parent</label>
                         <InputText id="parent" type="text" v-model="modelObj.parentCode" />
                     </div>
+                    <div class="flex flex-wrap gap-2 w-2/12">
+                        <label for="type">Type</label>
+                        <Select id="type" v-model="modelObj.type" :options="dropdownTypes"
+                                optionLabel="name"
+                                optionValue="code"
+                                default-value="TS"
+                                placeholder="Select One" class="w-full"></Select>
+                    </div>
                     <div class="flex flex-wrap gap-2 w-full">
                         <label for="taskid">Task ID</label>
-                        <InputText id="taskid" type="text" v-model="modelObj.code" />
+                        <InputGroup >
+                            <InputText id="taskid" type="text" v-model="modelObj.code" :readonly="mode.toLowerCase() != 'create'"/>
+                            <Button label="Gen" @click="onGenerateNewTaskId" v-if="mode.toLowerCase() == 'create'"/>
+                        </InputGroup>
                     </div>
                 </div>
                 <div class="flex flex-col md:flex-row gap-4">
