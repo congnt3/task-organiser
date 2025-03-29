@@ -26,6 +26,9 @@ public class Task extends ModelBase  {
     @Property("name")
     private String name;
 
+    @Property("type")
+    private String type;
+
     @Property("description")
     private String description;
 
@@ -55,4 +58,6 @@ public class Task extends ModelBase  {
 
     @Relationship(value = "dependsOn", direction = Relationship.Direction.OUTGOING, cascadeUpdates = false)
     private List<Task> dependsOn;
+
+    private List<ChildrenStatusStats> childrenStats;
 }
