@@ -26,6 +26,9 @@ public class Task extends ModelBase  {
     @Property("name")
     private String name;
 
+    @Property("type")
+    private String type;
+
     @Property("description")
     private String description;
 

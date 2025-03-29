@@ -34,7 +34,7 @@ const onSaveClick = async () => {
         };
 
         if (mode.value === "create") {
-            let updateResult = await taskService.createTask(reqBody);
+            let updateResult = await taskService.createTask(modelObj.value);
             if (updateResult) {
                 modelObj.value = updateResult;
                 mode.value = "update";
@@ -155,7 +155,8 @@ const addToDependency = async (data: Task) => {
                         <div class="flex flex-wrap gap-2 w-full">
                             <label for="estimated">Estimated (days)</label>
                             <div class="flex flex-col gap-1 w-full">
-                                <InputNumber v-model="modelObj.plannedStartDate" inputId="estimated" :min="0" :max="5" fluid />
+                                <InputNumber v-model="modelObj.plannedStartDate" inputId="estimated" :min="0" :max="5"
+                                             fluid/>
 
                             </div>
                         </div>
