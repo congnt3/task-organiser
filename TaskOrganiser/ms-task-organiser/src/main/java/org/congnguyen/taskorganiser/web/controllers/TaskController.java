@@ -130,19 +130,20 @@ public class TaskController {
     public ResponseEntity<List<TaskModel>> getTaskByParentCode(@PathVariable("parent_code") String code) {
         List<Task> result = null;
         if ("root".equalsIgnoreCase(code)) {
-            result = taskRepository.findTopLevelTasks();
+            result = taskService.findTopLevelTasks();
         } else {
             var tasks = taskService.findTaskByCode(code);
             if (tasks.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
 
-            result = taskRepository.findChildrenByTaskCode(tasks.get().getCode());
+            result = taskService.findTaskByParentCode(tasks.get().getCode());
         }
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(result.stream()
-                        .map(taskMapperImpl::taskToTaskModel).toList());
+                        .map(taskMapperImpl::taskToTaskModel)
+                        .toList());
     }
 
     @DeleteMapping("/code/{code}")

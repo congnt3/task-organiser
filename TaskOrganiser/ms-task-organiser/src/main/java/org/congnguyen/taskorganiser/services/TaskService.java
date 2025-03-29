@@ -80,4 +80,18 @@ public class TaskService {
         taskRepository.removeDependency(code, dependsOn);
         return true;
     }
+
+    public List<Task> findTaskByParentCode(String code) {
+        var result = taskRepository.findChildrenByTaskCode(code);
+        result.forEach(r -> r.setChildrenStats(childrenStatusStatsRepository.findByTaskCode(r.getCode())));
+
+        return result;
+    }
+
+    public List<Task> findTopLevelTasks() {
+        var result =  taskRepository.findTopLevelTasks();
+        result.forEach(r -> r.setChildrenStats(childrenStatusStatsRepository.findByTaskCode(r.getCode())));
+
+        return result;
+    }
 }
