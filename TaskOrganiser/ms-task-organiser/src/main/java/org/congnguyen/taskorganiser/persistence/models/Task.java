@@ -58,4 +58,6 @@ public class Task extends ModelBase  {
 
     @Relationship(value = "dependsOn", direction = Relationship.Direction.OUTGOING, cascadeUpdates = false)
     private List<Task> dependsOn;
+
+    private List<ChildrenStatusStats> childrenStats;
 }

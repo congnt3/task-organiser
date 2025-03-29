@@ -3,6 +3,7 @@ package org.congnguyen.taskorganiser.services;
 import lombok.extern.log4j.Log4j2;
 import org.congnguyen.taskorganiser.persistence.exceptions.DuplicatedRecordException;
 import org.congnguyen.taskorganiser.persistence.models.Task;
+import org.congnguyen.taskorganiser.persistence.repositories.ChildrenStatusStatsRepository;
 import org.congnguyen.taskorganiser.persistence.repositories.TaskRepository;
 import org.congnguyen.taskorganiser.persistence.exceptions.RecordNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +18,12 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
 
+    private final ChildrenStatusStatsRepository childrenStatusStatsRepository;
+
     @Autowired
-    public TaskService(TaskRepository taskRepository) {
+    public TaskService(TaskRepository taskRepository, ChildrenStatusStatsRepository childrenStatusStatsRepository) {
         this.taskRepository = taskRepository;
+        this.childrenStatusStatsRepository = childrenStatusStatsRepository;
     }
 
     public Task getTaskByCode(String code) throws RecordNotFoundException {
@@ -32,6 +36,9 @@ public class TaskService {
         if (withDependencies) {
             task.setDependsOn(taskRepository.findDependenciesByTaskCode(code));
         }
+
+        var childStats = childrenStatusStatsRepository.findByTaskCode(code);
+        task.setChildrenStats(childStats);
 
         return task;
     }
