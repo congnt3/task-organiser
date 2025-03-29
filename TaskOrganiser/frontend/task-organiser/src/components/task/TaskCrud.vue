@@ -38,21 +38,12 @@ const onSaveClick = async () => {
             return;
         }
 
-        let reqBody = {
-            "parentCode": modelObj.value.parentCode,
-            "code": modelObj.value.code,
-            "name": modelObj.value.name,
-            "description": modelObj.value.description,
-            "status": modelObj.value.status,
-            "dueDate": modelObj.value.dueDate
-        };
-
         if (mode.value === "create") {
             let updateResult = await taskService.createTask(modelObj.value);
             if (updateResult) {
                 modelObj.value = updateResult;
                 mode.value = "update";
-                console.log(`Creating child task for parent: ${reqBody.parentCode}`);
+                console.log(`Creating child task for parent: ${modelObj.value.parentCode}`);
                 showMessage("success", "Task saved");
             } else throw new Error(`Failed to save record: "${modelObj.value.code || ""}"`);
         } else if (mode.value === "update") {
@@ -61,7 +52,7 @@ const onSaveClick = async () => {
                 return;
             }
 
-            let updateResult = await taskService.updateTask(modelObj.value.code, reqBody);
+            let updateResult = await taskService.updateTask(modelObj.value.code, modelObj.value);
             if (updateResult) {
                 showMessage("success", "Task saved");
             } else throw new Error(`Failed to save record: "${modelObj.value.code || ""}"`);
@@ -184,7 +175,7 @@ const onGenerateNewTaskId = () => {
                         <div class="flex flex-wrap gap-2 w-full">
                             <label for="estimated">Estimated (days)</label>
                             <div class="flex flex-col gap-1 w-full">
-                                <InputNumber v-model="modelObj.plannedStartDate" inputId="estimated" :min="0" :max="5"
+                                <InputNumber v-model="modelObj.estimatedEffortDays" inputId="estimated" :min="0" :max="5"
                                              fluid/>
 
                             </div>
