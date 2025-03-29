@@ -215,7 +215,7 @@ function tagSeverity(status) {
             <TreeTable :value="nodes" :lazy="true" :paginator="false" :rows="rows" @nodeExpand="onExpand" :row-hover="true" tableStyle="min-width: 50rem">
                 <Column field="code" header="Code" :expander="true">
                     <template #body="slotProps">
-                        <a :href="'/pages/crud?root=' + slotProps.node.data.code">{{ slotProps.node.data.code }}</a>
+                        <a :href="'?root=' + slotProps.node.data.code">{{ slotProps.node.data.code }}</a>
                     </template>
                 </Column>
                 <Column field="name" header="Name"></Column>
