@@ -38,10 +38,7 @@ function getFilterQueryBody() {
 onMounted(() => {
     taskModel.value.parentCode = route.query.root || "root";
 
-    setTimeout(() => {
-        nodes.value = loadNodes(0, rows.value);
-        totalRecords.value = 100;
-    }, 1000);
+    nodes.value = loadNodes(0, rows.value);
 });
 
 function reloadData(force = false) {
