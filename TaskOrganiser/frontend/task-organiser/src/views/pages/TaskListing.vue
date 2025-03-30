@@ -44,6 +44,12 @@ onMounted(() => {
     }, 1000);
 });
 
+function reloadData(force = false) {
+    if (force || filterStatus.value.useFilter) {
+        loadNodes(0, rows.value);
+    }
+}
+
 // Watch for URL query parameter changes
 watch(
     () => route.query.root,
@@ -132,7 +138,10 @@ const refreshNode = async (node) => {
 const loadNodes = (first, rows) => {
     let loadingNodes = [];
 
-    taskService.getAllTasks(taskModel.value.parentCode).then((tasks) => {
+    let completable = filterStatus.value.useFilter ?
+        taskService.queryTasksWithChildStatus(taskModel.value.parentCode, getFilterQueryBody()) :
+        taskService.getAllTasks(taskModel.value.parentCode);
+    completable.then((tasks) => {
         for (const task of tasks) {
             loadingNodes.push({
                 key: task.code,
@@ -219,27 +228,28 @@ function tagSeverity(status) {
             <Toolbar class="mb-6">
                 <template #start>
                     <Button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" @click="openNew" />
+                    <Button label="Refresh" icon="pi pi-refresh" severity="secondary" class="mr-2" @click="reloadData(true)" />
                 </template>
 
                 <template #end>
                     <div class="flex flex-col md:flex-row gap-4">
                         <div class="flex items-center">
                             <label for="useFilter" style="{'padding-right': 5px}">Filter</label>
-                            <ToggleSwitch input-id="useFilter" v-model="filterStatus.useFilter" />
+                            <ToggleSwitch input-id="useFilter" v-model="filterStatus.useFilter" @value-change="reloadData(true)" />
                         </div>
                         <div class="flex items-center">
                             <ToggleButton v-model="filterStatus.new" onLabel="New" offLabel="New" on-icon="pi pi-check"
-                                          :style="{ width: '5em' }" />
+                                          :style="{ width: '5em' }" @click="reloadData" />
                         </div>
                         <div class="flex items-center">
                             <ToggleButton v-model="filterStatus.inProgress" onLabel="In-Progress" offLabel="In-Progress"
                                           on-icon="pi pi-check"
-                                          :style="{ width: '10em' }" />
+                                          :style="{ width: '10em' }" @click="reloadData" />
                         </div>
                         <div class="flex items-center">
                             <ToggleButton v-model="filterStatus.completed" onLabel="Completed" offLabel="Completed"
                                           on-icon="pi pi-check"
-                                          :style="{ width: '10em' }" />
+                                          :style="{ width: '10em' }" @click="reloadData" />
 
                         </div>
                     </div>
