@@ -11,11 +11,17 @@ const route = useRoute();
 // Create a reactive ref to store the query parameter value
 const taskModel = ref({});
 const taskDeleting = ref({});
-const taskCrudMode = ref('create');
+const taskCrudMode = ref("create");
 const taskService = new TaskService();
+const filterStatus = ref({
+    useFilter: false,
+    new: true,
+    inProgress: true,
+    completed: true
+});
 // Set the value initially
 onMounted(() => {
-    taskModel.value.parentCode = route.query.root || 'root';
+    taskModel.value.parentCode = route.query.root || "root";
 
     setTimeout(() => {
         nodes.value = loadNodes(0, rows.value);
@@ -27,7 +33,7 @@ onMounted(() => {
 watch(
     () => route.query.root,
     (newValue) => {
-        taskModel.value.parentCode = newValue || 'root';
+        taskModel.value.parentCode = newValue || "root";
     }
 );
 
@@ -36,14 +42,14 @@ const taskCrudDialog = ref(false);
 const deleteTaskDialog = ref(false);
 
 function openNew() {
-    taskCrudMode.value = 'create';
-    taskModel.value = { parentCode: route.query.root, status: 'NEW' };
+    taskCrudMode.value = "create";
+    taskModel.value = { parentCode: route.query.root, status: "NEW" };
 
     taskCrudDialog.value = true;
 }
 
 async function editTask(task) {
-    taskCrudMode.value = 'update';
+    taskCrudMode.value = "update";
     let theTask = await taskService.getTask(task.code);
     taskModel.value = {
         ...theTask
@@ -62,12 +68,12 @@ function deleteTask() {
     try {
         taskService.deleteTask(taskDeleting.value.code);
     } catch (error) {
-        console.error('Error deleting task:', error);
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete task', life: 3000 });
+        console.error("Error deleting task:", error);
+        toast.add({ severity: "error", summary: "Error", detail: "Failed to delete task", life: 3000 });
     }
     taskDeleting.value = {};
     deleteTaskDialog.value = false;
-    toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
+    toast.add({ severity: "success", summary: "Successful", detail: "Product Deleted", life: 3000 });
 }
 
 function createChildTask(parentCode) {
@@ -76,7 +82,7 @@ function createChildTask(parentCode) {
     }
 
     taskModel.value = { parentCode: parentCode.code, status: STATUS_NEW };
-    taskCrudMode.value = 'create';
+    taskCrudMode.value = "create";
     taskCrudDialog.value = true;
 }
 
@@ -93,8 +99,8 @@ const updateTaskStatus = async (node, status) => {
     try {
         await taskService.updateTaskStatus(node.data.code, status);
     } catch (error) {
-        console.error('Error updating task status:', error);
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update task status', life: 3000 });
+        console.error("Error updating task status:", error);
+        toast.add({ severity: "error", summary: "Error", detail: "Failed to update task status", life: 3000 });
     }
     await refreshNode(node);
 };
@@ -136,8 +142,8 @@ async function reloadANode(node) {
         // Fetch child tasks using the TaskService
         node.data = await taskService.getTask(node.data.code);
     } catch (error) {
-        console.error('Error loading task:', error);
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load task', life: 3000 });
+        console.error("Error loading task:", error);
+        toast.add({ severity: "error", summary: "Error", detail: "Failed to load task", life: 3000 });
     }
 }
 
@@ -178,8 +184,8 @@ async function doLoadChildren(node, forceReload = false) {
 
         node.children = lazyNode.children;
     } catch (error) {
-        console.error('Error loading child tasks:', error);
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load child tasks', life: 3000 });
+        console.error("Error loading child tasks:", error);
+        toast.add({ severity: "error", summary: "Error", detail: "Failed to load child tasks", life: 3000 });
     }
 }
 
@@ -191,11 +197,11 @@ function redrawTree() {
 function tagSeverity(status) {
     switch (status) {
         case STATUS_COMPLETED:
-            return 'success';
+            return "success";
         case STATUS_IN_PROGRESS:
-            return 'info';
+            return "info";
         case STATUS_NEW:
-            return 'warn';
+            return "warn";
     }
 }
 </script>
@@ -209,10 +215,31 @@ function tagSeverity(status) {
                 </template>
 
                 <template #end>
-                    <Button label="Export" icon="pi pi-upload" severity="secondary" @click="exportCSV($event)" />
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="flex items-center">
+                            <label for="useFilter" style="{'padding-right': 5px}">Filter</label>
+                            <ToggleSwitch input-id="useFilter" v-model="filterStatus.useFilter" />
+                        </div>
+                        <div class="flex items-center">
+                            <ToggleButton v-model="filterStatus.new" onLabel="New" offLabel="New" on-icon="pi pi-check"
+                                          :style="{ width: '5em' }" />
+                        </div>
+                        <div class="flex items-center">
+                            <ToggleButton v-model="filterStatus.inProgress" onLabel="In-Progress" offLabel="In-Progress"
+                                          on-icon="pi pi-check"
+                                          :style="{ width: '10em' }" />
+                        </div>
+                        <div class="flex items-center">
+                            <ToggleButton v-model="filterStatus.completed" onLabel="Completed" offLabel="Completed"
+                                          on-icon="pi pi-check"
+                                          :style="{ width: '10em' }" />
+
+                        </div>
+                    </div>
                 </template>
             </Toolbar>
-            <TreeTable :value="nodes" :lazy="true" :paginator="false" :rows="rows" @nodeExpand="onExpand" :row-hover="true" tableStyle="min-width: 50rem">
+            <TreeTable :value="nodes" :lazy="true" :paginator="false" :rows="rows" @nodeExpand="onExpand"
+                       :row-hover="true" tableStyle="min-width: 50rem">
                 <Column field="code" header="Code" :expander="true">
                     <template #body="slotProps">
                         <a :href="'?root=' + slotProps.node.data.code">{{ slotProps.node.data.code }}</a>
@@ -221,12 +248,14 @@ function tagSeverity(status) {
                 <Column field="name" header="Name"></Column>
                 <Column field="status" header="Status">
                     <template #body="slotProps">
-                        <Tag :severity="tagSeverity(slotProps.node.data.status)" :value="slotProps.node.data.status"></Tag>
+                        <Tag :severity="tagSeverity(slotProps.node.data.status)"
+                             :value="slotProps.node.data.status"></Tag>
                     </template>
                 </Column>
                 <Column :exportable="false" style="min-width: 8rem" header="Progress">
                     <template #body="slotProps">
-                        <Badge v-for="item in slotProps.node.data.childrenStats" :value="item.count" :severity="tagSeverity(item.status)" :key="item.code" />
+                        <Badge v-for="item in slotProps.node.data.childrenStats" :value="item.count"
+                               :severity="tagSeverity(item.status)" :key="item.code" />
                     </template>
                 </Column>
                 <Column :exportable="false" style="min-width: 12rem" header="Set Status">
@@ -253,16 +282,22 @@ function tagSeverity(status) {
                 </Column>
                 <Column :exportable="false" style="min-width: 12rem">
                     <template #body="slotProps">
-                        <Button icon="pi pi-refresh" outlined rounded class="mr-2" @click="refreshNode(slotProps.node)" :disabled="!slotProps.node.data" tooltip="Reload the node data" />
-                        <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editTask(slotProps.node.data)" />
-                        <Button icon="pi pi-trash" outlined rounded severity="danger" @click="confirmDeleteTask(slotProps.node.data)" />
-                        <Button icon="pi pi-plus" outlined rounded class="mr-2" @click="createChildTask(slotProps.node.data)" :disabled="!slotProps.node.data" tooltip="Create Child Task" />
+                        <Button icon="pi pi-refresh" outlined rounded class="mr-2" @click="refreshNode(slotProps.node)"
+                                :disabled="!slotProps.node.data" tooltip="Reload the node data" />
+                        <Button icon="pi pi-pencil" outlined rounded class="mr-2"
+                                @click="editTask(slotProps.node.data)" />
+                        <Button icon="pi pi-trash" outlined rounded severity="danger"
+                                @click="confirmDeleteTask(slotProps.node.data)" />
+                        <Button icon="pi pi-plus" outlined rounded class="mr-2"
+                                @click="createChildTask(slotProps.node.data)" :disabled="!slotProps.node.data"
+                                tooltip="Create Child Task" />
                     </template>
                 </Column>
             </TreeTable>
         </div>
 
-        <Dialog v-model:visible="taskCrudDialog" class="capitalize" :style="{ width: '900px' }" v-bind:header="taskCrudMode.concat(' Task Details')" :modal="true">
+        <Dialog v-model:visible="taskCrudDialog" class="capitalize" :style="{ width: '900px' }"
+                v-bind:header="taskCrudMode.concat(' Task Details')" :modal="true">
             <TaskCrud v-model="taskModel" v-model:mode="taskCrudMode" />
         </Dialog>
 
