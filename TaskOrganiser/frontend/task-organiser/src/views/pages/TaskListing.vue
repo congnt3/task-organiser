@@ -45,6 +45,7 @@ onMounted(() => {
 });
 
 function reloadData(force = false) {
+    console.log(`reloadData force=${force}, filter=${filterStatus.value.useFilter}`);
     if (force || filterStatus.value.useFilter) {
         loadNodes(0, rows.value);
     }
@@ -160,6 +161,7 @@ async function reloadANode(node) {
     try {
         // Fetch child tasks using the TaskService
         node.data = await taskService.getTask(node.data.code);
+
     } catch (error) {
         console.error("Error loading task:", error);
         toast.add({ severity: "error", summary: "Error", detail: "Failed to load task", life: 3000 });
@@ -228,28 +230,30 @@ function tagSeverity(status) {
             <Toolbar class="mb-6">
                 <template #start>
                     <Button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" @click="openNew" />
-                    <Button label="Refresh" icon="pi pi-refresh" severity="secondary" class="mr-2" @click="reloadData(true)" />
+                    <Button label="Refresh" icon="pi pi-refresh" severity="secondary" class="mr-2"
+                            @click="reloadData(true)" />
                 </template>
 
                 <template #end>
                     <div class="flex flex-col md:flex-row gap-4">
                         <div class="flex items-center">
                             <label for="useFilter" style="{'padding-right': 5px}">Filter</label>
-                            <ToggleSwitch input-id="useFilter" v-model="filterStatus.useFilter" @value-change="reloadData(true)" />
+                            <ToggleSwitch input-id="useFilter" v-model="filterStatus.useFilter"
+                                          @value-change="reloadData(true)" />
                         </div>
                         <div class="flex items-center">
                             <ToggleButton v-model="filterStatus.new" onLabel="New" offLabel="New" on-icon="pi pi-check"
-                                          :style="{ width: '5em' }" @click="reloadData" />
+                                          :style="{ width: '5em' }" @click="reloadData(false)" />
                         </div>
                         <div class="flex items-center">
                             <ToggleButton v-model="filterStatus.inProgress" onLabel="In-Progress" offLabel="In-Progress"
                                           on-icon="pi pi-check"
-                                          :style="{ width: '10em' }" @click="reloadData" />
+                                          :style="{ width: '10em' }" @click="reloadData(false)" />
                         </div>
                         <div class="flex items-center">
                             <ToggleButton v-model="filterStatus.completed" onLabel="Completed" offLabel="Completed"
                                           on-icon="pi pi-check"
-                                          :style="{ width: '10em' }" @click="reloadData" />
+                                          :style="{ width: '10em' }" @click="reloadData(false)" />
 
                         </div>
                     </div>
