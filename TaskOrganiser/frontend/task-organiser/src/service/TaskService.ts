@@ -9,7 +9,7 @@ import {
     RETRIEVE_TASKS_BY_PARENT_ENDPOINT,
     PATCH_TASK_STATUS_ENDPOINT,
     REMOVE_DEPENDENCY_ENDPOINT,
-    ADD_DEPENDENCIES_ENDPOINT, RETRIEVE_TASKS_GRAPH_BY_PARENT_ENDPOINT
+    ADD_DEPENDENCIES_ENDPOINT, RETRIEVE_TASKS_GRAPH_BY_PARENT_ENDPOINT, QUERY_TASKS_BY_PARENT_ENDPOINT
 } from "../config/api.config";
 
 export class TaskService {
@@ -45,6 +45,11 @@ export class TaskService {
      */
     public async getAllTasks(parentCode: string): Promise<Task[]> {
         const response = await this.apiService.get<Task[]>(RETRIEVE_TASKS_BY_PARENT_ENDPOINT.replace("{{code}}", parentCode));
+        return response.data || [];
+    }
+
+    public async queryTasksWithChildStatus(parentCode: string, statuses: string[]): Promise<Task[]> {
+        const response = await this.apiService.post<Task[]>(QUERY_TASKS_BY_PARENT_ENDPOINT.replace('{{code}}', parentCode), { taskStatus: statuses });
         return response.data || [];
     }
 
@@ -84,7 +89,7 @@ export class TaskService {
         return response.status === 200;
     }
 
-    async removeDependency(code: string, dependsOn: string){
+    async removeDependency(code: string, dependsOn: string) {
         const response = await this.apiService.delete<void>(
             REMOVE_DEPENDENCY_ENDPOINT
                 .replace("{{code}}", code)
@@ -92,7 +97,7 @@ export class TaskService {
         return response.status === 200;
     }
 
-    async addDependencies(code: string, dependsOn: string){
+    async addDependencies(code: string, dependsOn: string) {
         const response = await this.apiService.post<Task>(
             ADD_DEPENDENCIES_ENDPOINT
                 .replace("{{code}}", code), [dependsOn]);

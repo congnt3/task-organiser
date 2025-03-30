@@ -19,6 +19,21 @@ const filterStatus = ref({
     inProgress: true,
     completed: true
 });
+
+function getFilterQueryBody() {
+    let result = [];
+    if (filterStatus.value.new) {
+        result.push(STATUS_NEW);
+    }
+    if (filterStatus.value.inProgress) {
+        result.push(STATUS_IN_PROGRESS);
+    }
+    if (filterStatus.value.completed) {
+        result.push(STATUS_COMPLETED);
+    }
+    return result;
+}
+
 // Set the value initially
 onMounted(() => {
     taskModel.value.parentCode = route.query.root || "root";
@@ -121,12 +136,7 @@ const loadNodes = (first, rows) => {
         for (const task of tasks) {
             loadingNodes.push({
                 key: task.code,
-                data: {
-                    code: task.code,
-                    name: task.name,
-                    status: task.status,
-                    childrenStats: task.childrenStats
-                },
+                data: task,
                 leaf: isLeaf(task)
             });
         }
@@ -168,17 +178,14 @@ async function doLoadChildren(node, forceReload = false) {
 
     try {
         // Fetch child tasks using the TaskService
-        const childTasks = await taskService.getAllTasks(node.data.code);
+        const childTasks = filterStatus.value.useFilter ?
+            await taskService.queryTasksWithChildStatus(node.data.code, getFilterQueryBody()) :
+            await taskService.getAllTasks(node.data.code);
 
         let lazyNode = { ...node };
         lazyNode.children = childTasks.map((task) => ({
             key: task.code,
-            data: {
-                code: task.code,
-                name: task.name,
-                status: task.status,
-                childrenStats: task.childrenStats
-            },
+            data: task,
             leaf: isLeaf(task)
         }));
 
