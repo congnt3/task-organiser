@@ -2,10 +2,10 @@ package org.congnguyen.taskorganiser.services;
 
 import lombok.extern.log4j.Log4j2;
 import org.congnguyen.taskorganiser.persistence.exceptions.DuplicatedRecordException;
+import org.congnguyen.taskorganiser.persistence.exceptions.RecordNotFoundException;
 import org.congnguyen.taskorganiser.persistence.models.Task;
 import org.congnguyen.taskorganiser.persistence.repositories.ChildrenStatusStatsRepository;
 import org.congnguyen.taskorganiser.persistence.repositories.TaskRepository;
-import org.congnguyen.taskorganiser.persistence.exceptions.RecordNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -90,6 +90,20 @@ public class TaskService {
 
     public List<Task> findTopLevelTasks() {
         var result =  taskRepository.findTopLevelTasks();
+        result.forEach(r -> r.setChildrenStats(childrenStatusStatsRepository.findByTaskCode(r.getCode())));
+
+        return result;
+    }
+
+    public List<Task> queryChildrenThatContainsDescendantWithStatus(String rootCode, List<String> statuses) {
+        var result =  taskRepository.queryChildrenThatContainsDescendantWithStatus(rootCode, statuses);
+        result.forEach(r -> r.setChildrenStats(childrenStatusStatsRepository.findByTaskCode(r.getCode())));
+
+        return result;
+    }
+
+    public List<Task> queryTopLevelTasksThatContainsDescendantWithStatus(List<String> statuses) {
+        var result =  taskRepository.queryTopLevelTasksThatContainsDescendantWithStatus(statuses);
         result.forEach(r -> r.setChildrenStats(childrenStatusStatsRepository.findByTaskCode(r.getCode())));
 
         return result;

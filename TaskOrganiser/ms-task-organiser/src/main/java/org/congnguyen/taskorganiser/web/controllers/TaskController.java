@@ -10,6 +10,7 @@ import org.congnguyen.taskorganiser.services.TaskService;
 import org.congnguyen.taskorganiser.web.mappers.TaskMapperImpl;
 import org.congnguyen.taskorganiser.web.models.CreateTaskRequest;
 import org.congnguyen.taskorganiser.web.models.ErrorResponse;
+import org.congnguyen.taskorganiser.web.models.QueryRequestBody;
 import org.congnguyen.taskorganiser.web.models.TaskModel;
 import org.congnguyen.taskorganiser.web.models.graph.Graph;
 import org.congnguyen.taskorganiser.web.services.TaskGraphOrderService;
@@ -125,10 +126,9 @@ public class TaskController {
         }
     }
 
-    // Not working
     @GetMapping("/parent/{parent_code}")
     public ResponseEntity<List<TaskModel>> getTaskByParentCode(@PathVariable("parent_code") String code) {
-        List<Task> result = null;
+        List<Task> result;
         if ("root".equalsIgnoreCase(code)) {
             result = taskService.findTopLevelTasks();
         } else {
@@ -138,6 +138,28 @@ public class TaskController {
             }
 
             result = taskService.findTaskByParentCode(tasks.get().getCode());
+        }
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(result.stream()
+                        .map(taskMapperImpl::taskToTaskModel)
+                        .toList());
+    }
+
+    @PostMapping("/parent/{parent_code}")
+    public ResponseEntity<List<TaskModel>> queryTaskByDescendantStatus(
+            @PathVariable("parent_code") String rootCode,
+            @RequestBody QueryRequestBody queryRequestBody) {
+        List<Task> result;
+        if ("root".equalsIgnoreCase(rootCode)) {
+            result = taskService.queryTopLevelTasksThatContainsDescendantWithStatus(queryRequestBody.getTaskStatus());
+        } else {
+            var task = taskService.findTaskByCode(rootCode);
+            if (task.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            result = taskService.queryChildrenThatContainsDescendantWithStatus(task.get().getCode(), queryRequestBody.getTaskStatus());
         }
         return ResponseEntity
                 .status(HttpStatus.OK)

@@ -25,6 +25,14 @@ public interface TaskRepository extends Neo4jRepository<Task, String> {
     @Query("MATCH (c:Task) WHERE NOT ()<-[:memberOf]-(c) RETURN c")
     List<Task> findTopLevelTasks();
 
+    @Query("MATCH (p:Task {code: $code}) <- [:memberOf] - (c:Task) where c.status in $statuses return c UNION MATCH (p:Task {code: $code}) <- [:memberOf] - (c:Task) <-[:memberOf*1..]-(d:Task) where d.status in $statuses return c")
+    List<Task> queryChildrenThatContainsDescendantWithStatus(@Param("code") String rootCode, @Param("statuses") List<String> statuses);
+
+    @Query("MATCH (c:Task) where NOT ()<-[:memberOf]-(c) AND c.status in $statuses return c UNION MATCH (c:Task) <-[:memberOf*1..]-(d:Task) where NOT ()<-[:memberOf]-(c) AND d.status in $statuses return c")
+    List<Task> queryTopLevelTasksThatContainsDescendantWithStatus(@Param("statuses") List<String> statuses);
+
     @Query("MATCH (t:Task)-[n:dependsOn]->(d:Task) WHERE t.code = $code AND d.code = $dependsOn DELETE n")
     void removeDependency(@Param("code") String code, @Param("dependsOn") String dependsOn);
+
+
 }
