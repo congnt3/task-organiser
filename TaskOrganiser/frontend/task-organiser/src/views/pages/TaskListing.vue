@@ -223,7 +223,7 @@ function tagSeverity(status) {
 
 function navigateToGraphView(){
     let url = '/pages/deps' + (route.query.root ? '?root=' + route.query.root.toString() : '');
-    router.replace(url);
+    router.push(url);
 }
 </script>
 
