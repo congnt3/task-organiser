@@ -69,6 +69,8 @@ public abstract class TaskMapper {
                 var nodeT = this.taskToTaskModelGraphNode(t);
 
                 var dependencies = t.getDependsOn();
+                t.setChildren(taskRepository.findChildrenByTaskCode(t.getCode()));
+                dependencies.addAll(t.getChildren());
                 List<Node<TaskModel>> convertedNodes = new ArrayList<>();
                 if (dependencies != null) {
                     //Add all dependencies
