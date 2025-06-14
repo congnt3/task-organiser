@@ -11,6 +11,7 @@ import "@vue-flow/core/dist/style.css";
 /* this contains the default theme, these are optional styles */
 import "@vue-flow/core/dist/theme-default.css";
 import { TaskService } from "@/service/TaskService.ts";
+import {useRoute} from "vue-router";
 
 const { onConnect, addEdges } = useVueFlow();
 const taskService = new TaskService();
@@ -20,7 +21,9 @@ const nodes = ref<Node[]>([]);
 const edges = ref<Edge[]>([]);
 const drawerModel = ref({ visible: false, data: {} });
 const drawerExcludedKeys = ["children", "externalLinks"];
-taskService.getAllTasksAsGraph("root")
+const route = useRoute();
+
+taskService.getAllTasksAsGraph(route.query.root?.toString() || "root")
     .then(graph => {
         nodes.value = graph.nodes;
         edges.value = graph.edges;
