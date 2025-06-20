@@ -103,10 +103,13 @@ public class TaskGraphOrderService implements GraphOrderService<TaskModel> {
             return;
         }
 
+        var maxLevelItemCount = displayMap.stream().max(Comparator.comparingInt(ArrayList::size)).map(ArrayList::size).orElse(1);
         var nodeIndex = displayMap.get(node.getDepLevel()).indexOf(node);
+        int BASE_X_DISTANCE = 200;
+        int currentBaseXDistance = BASE_X_DISTANCE * maxLevelItemCount / (displayMap.get(node.getDepLevel()).size());
         int x = nodeIndex == 0 ?
-                (random.nextInt(200)) :
-                (displayMap.get(node.getDepLevel()).get(nodeIndex - 1).getPosition().getX() + 200);
+                (random.nextInt(currentBaseXDistance)) :
+                (displayMap.get(node.getDepLevel()).get(nodeIndex - 1).getPosition().getX() + currentBaseXDistance);
         var y = (node.getDepLevel() + 1) * -300;
         node.getPosition().setX(x);
         node.getPosition().setY(y);
